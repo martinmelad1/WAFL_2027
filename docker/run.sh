@@ -1,99 +1,160 @@
 #!/bin/bash
 # =============================================================
-#  WAFL 2025 — Docker launcher
-#  Usage:  bash run.sh [command]
+#  WAFL 2025 — Docker Launcher
+#  Usage:  bash docker/run.sh <command>
 #
 #  Commands:
-#    build       — Build the Docker image (run once)
-#    gui         — URDF viewer: see robot model + joint sliders
-#    gazebo      — Gazebo simulation (spawn robot in empty world)
-#    teleop      — Keyboard teleoperation (WASD + QE strafe)
-#    slam        — Hector SLAM mapping mode
-#    nav         — Full autonomous navigation (AMCL + move_base)
-#    shell       — Open a bash shell inside the container
+#    build    Build the Docker image (run once, ~10 min)
+#    gui      View robot URDF model + interactive joint sliders
+#    gazebo   Spawn robot in Gazebo (empty world, no teleop)
+#    teleop   Gazebo + keyboard teleoperation  ← START HERE
+#    slam     Hector SLAM mapping (requires real LiDAR)
+#    nav      Full autonomous navigation stack
+#    shell    Open interactive bash shell in container
 # =============================================================
 
+set -e
+
 IMAGE="wafl2025:latest"
-PACKAGE_PATH="$(cd "$(dirname "$0")/.." && pwd)/WAFL2025-forklift2425-patch-manual-mapping"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PACKAGE_DIR="$REPO_ROOT/WAFL2025-forklift2425-patch-manual-mapping/WAFL2025"
 
-# Allow Docker to use your display
-xhost +local:docker > /dev/null 2>&1
+# ── Detect display ────────────────────────────────────────────
+if [ -z "$DISPLAY" ]; then
+  echo "[WARN] No DISPLAY variable set. GUI windows may not appear."
+  echo "       If on a desktop, try: export DISPLAY=:0"
+fi
 
-# Common Docker flags for GUI support
-DOCKER_FLAGS=(
-    --rm
-    --env DISPLAY="$DISPLAY"
-    --env QT_X11_NO_MITSHM=1
-    --env LIBGL_ALWAYS_SOFTWARE=0
-    --volume /tmp/.X11-unix:/tmp/.X11-unix:rw
-    --volume "$PACKAGE_PATH/WAFL2025:/catkin_ws/src/WAFL2025"
-    --network host
-    --privileged
+# ── Allow Docker to use host display ──────────────────────────
+xhost +local:docker > /dev/null 2>&1 || true
+
+# ── Common Docker run flags ───────────────────────────────────
+DOCKER_RUN=(
+  docker run --rm
+  --env DISPLAY="$DISPLAY"
+  --env QT_X11_NO_MITSHM=1
+  --env LIBGL_ALWAYS_SOFTWARE=0
+  --env ROS_MASTER_URI=http://localhost:11311
+  --volume /tmp/.X11-unix:/tmp/.X11-unix:rw
+  # Live-mount the package so changes on host appear instantly
+  --volume "$PACKAGE_DIR:/catkin_ws/src/WAFL2025"
+  --network host
+  --privileged
 )
 
+# ── Commands ──────────────────────────────────────────────────
 case "$1" in
 
+  # ── BUILD ────────────────────────────────────────────────────
   build)
-    echo ">>> Building WAFL2025 Docker image (this takes ~5-10 min first time)..."
-    REPO25_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-    docker build -t "$IMAGE" -f "$(dirname "$0")/Dockerfile" "$REPO25_ROOT"
-    echo ">>> Done! Image '$IMAGE' is ready."
+    echo ""
+    echo "╔══════════════════════════════════════════════════════╗"
+    echo "║         Building WAFL2025 Docker image               ║"
+    echo "║  This downloads ~2 GB and takes ~10 min first time   ║"
+    echo "╚══════════════════════════════════════════════════════╝"
+    echo ""
+    docker build \
+      -t "$IMAGE" \
+      -f "$SCRIPT_DIR/Dockerfile" \
+      "$REPO_ROOT"
+    echo ""
+    echo "✅  Build complete! Image: $IMAGE"
+    echo ""
+    echo "Next steps:"
+    echo "  bash docker/run.sh gui     ← see the robot model"
+    echo "  bash docker/run.sh teleop  ← drive it in simulation"
     ;;
 
+  # ── GUI — Robot model viewer ──────────────────────────────────
   gui)
-    echo ">>> Launching URDF viewer (joint_state_publisher_gui + RViz)..."
-    docker run "${DOCKER_FLAGS[@]}" "$IMAGE" \
-      bash -c "source /catkin_ws/devel/setup.bash && \
-               roslaunch WAFL2025 display.launch"
+    echo "🤖  Launching URDF viewer (RViz + joint sliders)..."
+    echo "    Close the RViz window to exit."
+    echo ""
+    "${DOCKER_RUN[@]}" "$IMAGE" \
+      roslaunch WAFL2025 sim_display.launch
     ;;
 
+  # ── GAZEBO — Simulation only ──────────────────────────────────
   gazebo)
-    echo ">>> Launching Gazebo simulation..."
-    docker run "${DOCKER_FLAGS[@]}" "$IMAGE" \
-      bash -c "source /catkin_ws/devel/setup.bash && \
-               roslaunch WAFL2025 gazebo.launch"
+    echo "🌍  Launching Gazebo simulation (robot in empty world)..."
+    echo "    Close the Gazebo window to exit."
+    echo ""
+    "${DOCKER_RUN[@]}" "$IMAGE" \
+      roslaunch WAFL2025 sim_teleop.launch
     ;;
 
+  # ── TELEOP — Gazebo + keyboard control ───────────────────────
   teleop)
-    echo ">>> Launching Gazebo + keyboard teleoperation..."
-    echo "    Keys: W=forward  S=backward  A=turn-left  D=turn-right"
-    echo "          Q=strafe-left  E=strafe-right  Space=STOP"
-    docker run -it "${DOCKER_FLAGS[@]}" "$IMAGE" \
-      bash -c "source /catkin_ws/devel/setup.bash && \
-               roslaunch WAFL2025 hector_slam.launch &
-               sleep 4 &&
+    echo "🕹️   Launching Gazebo + keyboard teleoperation..."
+    echo ""
+    echo "    Keyboard controls (click the terminal, then type):"
+    echo "      W / S  — Forward / Backward"
+    echo "      A / D  — Turn Left / Right"
+    echo "      Q / E  — Strafe Left / Right"
+    echo "      Space  — Emergency STOP"
+    echo "      Z      — Zero steering"
+    echo "      + / -  — Speed up / slow down"
+    echo "      Ctrl-C — Exit"
+    echo ""
+    echo "    Gazebo window will open. Wait ~5 seconds for it to load."
+    echo ""
+    "${DOCKER_RUN[@]}" -it "$IMAGE" \
+      bash -c "roslaunch WAFL2025 sim_teleop.launch &
+               sleep 6
                rosrun WAFL2025 teleop_keyboard.py"
     ;;
 
+  # ── SLAM — Hector SLAM mapping (real hardware) ────────────────
   slam)
-    echo ">>> Launching Hector SLAM mapping mode..."
-    docker run "${DOCKER_FLAGS[@]}" "$IMAGE" \
-      bash -c "source /catkin_ws/devel/setup.bash && \
-               roslaunch WAFL2025 hector_slam.launch"
-    ;;
-
-  nav)
-    echo ">>> Launching full autonomous navigation stack..."
-    docker run "${DOCKER_FLAGS[@]}" "$IMAGE" \
-      bash -c "source /catkin_ws/devel/setup.bash && \
-               roslaunch WAFL2025 move_base.launch"
-    ;;
-
-  shell)
-    echo ">>> Opening shell inside WAFL2025 container..."
-    docker run -it "${DOCKER_FLAGS[@]}" "$IMAGE" bash
-    ;;
-
-  *)
-    echo "Usage: bash run.sh [build|gui|gazebo|teleop|slam|nav|shell]"
+    echo "🗺️   Launching Hector SLAM (requires RPLiDAR on /dev/ttyUSB0)..."
+    echo "    Connect your LiDAR before running this."
     echo ""
-    echo "  build   — Build Docker image (first time only, ~5-10 min)"
-    echo "  gui     — URDF viewer with interactive joint sliders"
-    echo "  gazebo  — Gazebo simulation (empty world)"
-    echo "  teleop  — Gazebo + keyboard teleoperation (WASD)"
-    echo "  slam    — Hector SLAM mapping mode"
-    echo "  nav     — Full autonomous navigation (AMCL + move_base)"
-    echo "  shell   — Interactive bash shell in the container"
+    "${DOCKER_RUN[@]}" \
+      --device /dev/ttyUSB0 \
+      "$IMAGE" \
+      roslaunch WAFL2025 hector_slam.launch
+    ;;
+
+  # ── NAV — Full autonomous navigation ─────────────────────────
+  nav)
+    echo "🧭  Launching full autonomous navigation stack..."
+    echo "    (AMCL + move_base + custom Pure Pursuit controller)"
+    echo ""
+    "${DOCKER_RUN[@]}" "$IMAGE" \
+      roslaunch WAFL2025 move_base.launch
+    ;;
+
+  # ── SHELL — Interactive bash inside container ─────────────────
+  shell)
+    echo "💻  Opening bash shell inside WAFL2025 container..."
+    echo "    ROS and workspace are already sourced."
+    echo "    Type 'exit' to leave."
+    echo ""
+    "${DOCKER_RUN[@]}" -it "$IMAGE" bash
+    ;;
+
+  # ── HELP ──────────────────────────────────────────────────────
+  *)
+    echo ""
+    echo "WAFL 2025 — Docker Launcher"
+    echo ""
+    echo "Usage:  bash docker/run.sh <command>"
+    echo ""
+    echo "Commands:"
+    echo "  build    Build Docker image (first time only, ~10 min)"
+    echo "  gui      View robot URDF + interactive joint sliders"
+    echo "  gazebo   Spawn robot in Gazebo simulation"
+    echo "  teleop   Gazebo + keyboard control (recommended for testing)"
+    echo "  slam     Hector SLAM mapping (needs real LiDAR)"
+    echo "  nav      Full autonomous navigation stack"
+    echo "  shell    Interactive bash shell in container"
+    echo ""
+    echo "Quick start:"
+    echo "  bash docker/run.sh build    # build once"
+    echo "  bash docker/run.sh gui      # see the robot"
+    echo "  bash docker/run.sh teleop   # drive it"
+    echo ""
     ;;
 
 esac

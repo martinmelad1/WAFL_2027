@@ -5,6 +5,67 @@
 
 ---
 
+## 🚀 Quick Start (Docker — works on any Linux)
+
+> **No ROS installation needed.** Everything runs inside Docker.
+
+### Prerequisites
+- Linux (Ubuntu 20.04 / 22.04 or later)
+- [Docker](https://docs.docker.com/engine/install/ubuntu/) installed
+- A display (for GUI windows — works on desktop, not headless servers)
+
+### 1. Clone / get the repo
+
+```bash
+git clone <repo-url>
+cd repo25
+```
+
+### 2. Allow Docker to open GUI windows
+
+```bash
+xhost +local:docker
+```
+
+> Run this once per login session (every time you restart your PC).
+
+### 3. Build the Docker image *(first time only, ~10 min)*
+
+```bash
+bash docker/run.sh build
+```
+
+This downloads Ubuntu 20.04 + ROS Noetic + Gazebo + all dependencies and builds the WAFL2025 package inside the image automatically.
+
+### 4. Run it
+
+| What you want to see | Command |
+|----------------------|---------|
+| 🤖 Robot 3D model + joint sliders | `bash docker/run.sh gui` |
+| 🌍 Robot in Gazebo simulation | `bash docker/run.sh gazebo` |
+| 🕹️ Drive it manually (keyboard) | `bash docker/run.sh teleop` |
+| 🗺️ SLAM mapping mode | `bash docker/run.sh slam` |
+| 🧭 Full autonomous navigation | `bash docker/run.sh nav` |
+| 💻 Open a shell inside container | `bash docker/run.sh shell` |
+
+### Keyboard controls (teleop mode)
+
+| Key | Action |
+|-----|--------|
+| `W` | Forward |
+| `S` | Backward |
+| `A` | Turn left |
+| `D` | Turn right |
+| `Q` | Strafe left |
+| `E` | Strafe right |
+| `Space` | **Emergency stop** |
+| `+` / `-` | Speed up / slow down |
+| `Z` | Zero steering angles |
+
+> **Note:** ROS 1 Noetic reached end-of-life in May 2025. The Docker image has everything pre-installed so this does not affect functionality — the warning is safe to ignore.
+
+---
+
 ## About
 
 The **Autonomous Forklift Project (WAFL 2025)** is a graduation project from the Mechatronics Department at Ain Shams University. The goal is to design and implement an intelligent, fully autonomous forklift capable of navigating warehouse environments, localizing itself within pre-built maps, and executing autonomous pick-and-place tasks — all without human intervention.

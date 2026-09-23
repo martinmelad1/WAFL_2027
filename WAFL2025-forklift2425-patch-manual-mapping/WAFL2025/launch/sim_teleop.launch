@@ -1,0 +1,61 @@
+<!-- 
+  sim_teleop.launch
+  ==================
+  Simulation-only launch: Gazebo + RViz + keyboard teleoperation.
+  Does NOT require any physical hardware (no LiDAR, no CAN, no Arduino).
+  
+  Use: roslaunch WAFL2025 sim_teleop.launch
+-->
+<launch>
+
+  <!-- ===== Robot Description ===== -->
+  <param name="robot_description" textfile="$(find WAFL2025)/urdf/WAFL2025.urdf"/>
+
+  <!-- ===== Gazebo (empty world) ===== -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="paused"     value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="headless"   value="false"/>
+    <arg name="debug"      value="false"/>
+  </include>
+
+  <!-- ===== Spawn robot into Gazebo ===== -->
+  <node name="spawn_model"
+        pkg="gazebo_ros"
+        type="spawn_model"
+        args="-param robot_description -urdf -model WAFL2025 -x 0 -y 0 -z 0.3"
+        output="screen"/>
+
+  <!-- ===== Base → footprint TF ===== -->
+  <node name="tf_footprint_base"
+        pkg="tf"
+        type="static_transform_publisher"
+        args="0 0 0 0 0 0 base_link base_footprint 40"/>
+
+  <!-- ===== Joint State Publisher (no GUI, reads from Gazebo) ===== -->
+  <node name="joint_state_publisher"
+        pkg="joint_state_publisher"
+        type="joint_state_publisher">
+    <param name="use_gui" value="false"/>
+  </node>
+
+  <!-- ===== Robot State Publisher (publishes TF tree from URDF) ===== -->
+  <node name="robot_state_publisher"
+        pkg="robot_state_publisher"
+        type="robot_state_publisher"
+        respawn="false"
+        output="screen"/>
+
+  <!-- ===== Manual Drive Controller (cmd_vel → wheel/steer topics) ===== -->
+  <node name="manual_drive_control"
+        pkg="WAFL2025"
+        type="manual_drive_control.py"
+        output="screen"/>
+
+  <!-- ===== RViz ===== -->
+  <node name="rviz"
+        pkg="rviz"
+        type="rviz"
+        args="-d $(find WAFL2025)/config/trial.rviz"/>
+
+</launch>

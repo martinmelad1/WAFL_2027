@@ -1,0 +1,30 @@
+<!-- 
+  sim_display.launch
+  ===================
+  Shows the robot URDF in RViz with interactive joint sliders.
+  No Gazebo, no hardware needed. Pure model viewer.
+  
+  Use: roslaunch WAFL2025 sim_display.launch
+-->
+<launch>
+
+  <!-- Load URDF -->
+  <param name="robot_description" textfile="$(find WAFL2025)/urdf/WAFL2025.urdf"/>
+
+  <!-- Joint state publisher with GUI sliders -->
+  <node name="joint_state_publisher_gui"
+        pkg="joint_state_publisher_gui"
+        type="joint_state_publisher_gui"/>
+
+  <!-- Robot state publisher (URDF → TF) -->
+  <node name="robot_state_publisher"
+        pkg="robot_state_publisher"
+        type="robot_state_publisher"/>
+
+  <!-- RViz with a clean default config -->
+  <node name="rviz"
+        pkg="rviz"
+        type="rviz"
+        args="-d $(find WAFL2025)/config/trial.rviz"/>
+
+</launch>
