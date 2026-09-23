@@ -29,13 +29,23 @@
         output="screen"/>
 
   <!-- ===== Robot State Publisher (URDF → TF for all joints) ===== -->
-  <!-- NOTE: joint states come from Gazebo physics — do NOT run joint_state_publisher
-       alongside Gazebo or it will fight the physics engine and cause spinning -->
   <node name="robot_state_publisher"
         pkg="robot_state_publisher"
         type="robot_state_publisher"
         respawn="false"
         output="screen"/>
+
+  <!-- ===== Joint State Publisher ===== -->
+  <!-- Publishes joint states for joints Gazebo does NOT control
+       (leftweb, rightweb, castorjoint, castorwheel steering joints).
+       source_list merges Gazebo's wheel joint states (/joint_states)
+       so robot_state_publisher can compute TF for all links. -->
+  <node name="joint_state_publisher"
+        pkg="joint_state_publisher"
+        type="joint_state_publisher">
+    <param name="use_gui" value="false"/>
+    <rosparam param="source_list">[/joint_states]</rosparam>
+  </node>
 
   <!-- ===== Static TF: map → odom ===== -->
   <!-- The Gazebo diff_drive plugin already publishes odom → base_link.
