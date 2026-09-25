@@ -82,5 +82,5 @@ services:
       bash -c "
         source /opt/ros/humble/setup.bash &&
         source /WAFL_2027/WAFL2026/Localization/Simulation/install/setup.bash &&
-        ros2 run rviz2 rviz2 -d \$$(ros2 pkg prefix nav2_bringup)/share/nav2_bringup/rviz/nav2_default_view.rviz
+        ros2 run rviz2 rviz2 -d $$(ros2 pkg prefix nav2_bringup)/share/nav2_bringup/rviz/nav2_default_view.rviz --ros-args -p use_sim_time:=true
       "

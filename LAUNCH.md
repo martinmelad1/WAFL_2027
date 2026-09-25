@@ -88,6 +88,7 @@ If you don't have Ubuntu 22.04 or ROS 2 Humble installed (e.g., you are on Ubunt
    cd docker
    # Then start the containers
    docker compose up -d --build
+   # Note: If your system uses an older version of Docker, you may need to run `docker-compose up -d --build` (with a hyphen) instead.
    ```
    > ⏱️ *Note: The first time you run this, it will take a few minutes to build the Docker image.*
 
