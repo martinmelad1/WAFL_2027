@@ -71,14 +71,27 @@ git clone https://github.com/martinmelad1/WAFL_2027.git
 cd WAFL_2027
 ```
 
-> All commands from this point on assume you are inside the cloned folder.  
-> They use `$REPO` as a shortcut — set it once per terminal session:
+> 📌 **All the commands below run inside the `WAFL2026/` folder which is inside the cloned repo.**
+
+---
+
+### What is `$REPO` and do I need it?
+
+`$REPO` is just a shortcut variable so you don't have to type the full path every time.
+
+**Set it once at the start of every terminal session**, right after you open a new terminal:
 
 ```bash
-REPO=$(git rev-parse --show-toplevel)
+# Paste this at the start of every new terminal — change the path if you cloned somewhere else
+REPO=~/WAFL_2027
 ```
 
-> Run this in **every new terminal** you open before using any `$REPO/...` path below.
+Then instead of typing `/home/yourname/WAFL_2027/WAFL2026/Localization/Simulation` every time,
+you just type `$REPO/WAFL2026/Localization/Simulation`.
+
+> ✅ **Does it always work?**  
+> Yes — as long as you set it once at the top of your terminal. If you open a new terminal and forget to set it, any `$REPO/...` command will fail with `cd: /WAFL2026/...: No such file or directory`.  
+> The fix is always the same: run `REPO=~/WAFL_2027` again.
 
 ---
 
@@ -127,7 +140,7 @@ colcon build --symlink-install
 ### Terminal 1 — Gazebo simulation (Ignition + AMCL + EKF)
 
 ```bash
-REPO=$(git -C ~/WAFL_2027 rev-parse --show-toplevel)   # adjust path if you cloned elsewhere
+REPO=~/WAFL_2027                  # set this if you haven't already
 source /opt/ros/humble/setup.bash
 source $REPO/WAFL2026/Localization/Simulation/install/setup.bash
 
@@ -144,7 +157,7 @@ LIBGL_ALWAYS_SOFTWARE=1 ros2 launch wafl2026 humble4.launch.py
 ### Terminal 2 — Nav2 navigation stack
 
 ```bash
-REPO=$(git -C ~/WAFL_2027 rev-parse --show-toplevel)
+REPO=~/WAFL_2027
 source /opt/ros/humble/setup.bash
 source $REPO/WAFL2026/Navigation/Simulation/install/setup.bash
 
@@ -156,7 +169,7 @@ ros2 launch wafl_navigation navigation.launch.py
 ### Terminal 3 — Caster steering controller
 
 ```bash
-REPO=$(git -C ~/WAFL_2027 rev-parse --show-toplevel)
+REPO=~/WAFL_2027
 source /opt/ros/humble/setup.bash
 source $REPO/WAFL2026/Navigation/Simulation/install/setup.bash
 
@@ -175,7 +188,7 @@ ros2 run wafl_navigation caster_controller
 > If you only source `/opt/ros/humble`, RViz throws `Package [wafl2026] does not exist` errors and the robot model won't load.
 
 ```bash
-REPO=$(git -C ~/WAFL_2027 rev-parse --show-toplevel)
+REPO=~/WAFL_2027
 source /opt/ros/humble/setup.bash
 source $REPO/WAFL2026/Localization/Simulation/install/setup.bash
 
