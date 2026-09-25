@@ -71,7 +71,44 @@ git clone https://github.com/martinmelad1/WAFL_2027.git
 cd WAFL_2027
 ```
 
-> 📌 **All the commands below run inside the `WAFL2026/` folder which is inside the cloned repo.**
+---
+
+## 🚀 NEW: Run via Docker (Recommended for Ubuntu 24.04 / Non-Humble users)
+
+If you don't have Ubuntu 22.04 or ROS 2 Humble installed (e.g., you are on Ubuntu 24.04 with Jazzy), you can run the entire simulation inside Docker! The container handles ROS 2 Humble internally, so no code changes are needed.
+
+1. Make sure you have Docker and Docker Compose installed.
+2. Allow X11 forwarding for GUI apps (Gazebo/RViz) so they can appear on your host machine:
+   ```bash
+   xhost +local:docker
+   ```
+3. Start the simulation stack:
+   ```bash
+   # First, move into the docker folder (from the root of the repo)
+   cd docker
+   # Then start the containers
+   docker compose up -d --build
+   ```
+   > ⏱️ *Note: The first time you run this, it will take a few minutes to build the Docker image.*
+
+4. This automatically launches 4 containers mirroring the 4-terminal setup below. The Gazebo and RViz windows will pop up on your screen.
+5. To run the manual dashboard (optional), open a bash shell inside the simulation container:
+   ```bash
+   # Make sure you are still in the docker/ folder
+   docker compose exec wafl-sim bash
+   python3 /WAFL_2027/WAFL2026/Integration/wafl_manual_dashboard.py
+   ```
+6. To shut everything down:
+   ```bash
+   # Make sure you are still in the docker/ folder
+   docker compose down
+   ```
+
+**If you are using Docker, you can skip all the native installation and build steps below!**
+
+---
+
+> 📌 **If you are running NATIVELY (without Docker), all the commands below run inside the cloned repo.**
 
 ---
 

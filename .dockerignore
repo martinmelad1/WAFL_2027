@@ -1,0 +1,19 @@
+# Build artifacts — rebuilt inside the container
+WAFL2026/Localization/Simulation/build/
+WAFL2026/Localization/Simulation/install/
+WAFL2026/Localization/Simulation/log/
+WAFL2026/Navigation/Simulation/build/
+WAFL2026/Navigation/Simulation/install/
+WAFL2026/Navigation/Simulation/log/
+
+# Python cache
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# Git history (not needed in image)
+.git/
+
+# VS Code / IDE files
+.vscode/
+.agents/

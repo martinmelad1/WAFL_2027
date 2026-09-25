@@ -1,0 +1,86 @@
+# ============================================================
+# WAFL 2026 — Docker Compose
+# Runs 4 containers mirroring the 4-terminal launch sequence
+# Usage:  docker compose up -d --build wafl-sim   (start sim first)
+#         then in separate shells: docker compose exec wafl-sim bash
+# ============================================================
+
+x-base: &base
+  image: wafl2026:humble
+  build:
+    context: ..
+    dockerfile: docker/Dockerfile
+  environment:
+    - DISPLAY=${DISPLAY:-:0}
+    - LIBGL_ALWAYS_SOFTWARE=1
+    - QT_X11_NO_MITSHM=1
+    - ROS_DOMAIN_ID=0
+  volumes:
+    # X11 forwarding — GUI windows (Gazebo, RViz) appear on the host
+    - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    # Live-edit your source files without rebuilding the image
+    - ..:/WAFL_2027:rw
+    # Prevent host's old build/install folders from overriding the container's newly built ones
+    - /WAFL_2027/WAFL2026/Localization/Simulation/build
+    - /WAFL_2027/WAFL2026/Localization/Simulation/install
+    - /WAFL_2027/WAFL2026/Localization/Simulation/log
+    - /WAFL_2027/WAFL2026/Navigation/Simulation/build
+    - /WAFL_2027/WAFL2026/Navigation/Simulation/install
+    - /WAFL_2027/WAFL2026/Navigation/Simulation/log
+  network_mode: host
+  ipc: host
+  stdin_open: true
+  tty: true
+
+services:
+
+  # ── Terminal 1: Gazebo + AMCL + EKF ───────────────────────
+  wafl-sim:
+    <<: *base
+    container_name: wafl-sim
+    command: >
+      bash -c "
+        source /opt/ros/humble/setup.bash &&
+        source /WAFL_2027/WAFL2026/Localization/Simulation/install/setup.bash &&
+        cd /WAFL_2027/WAFL2026/Localization/Simulation &&
+        ros2 launch wafl2026 humble4.launch.py
+      "
+
+  # ── Terminal 2: Nav2 navigation stack ─────────────────────
+  wafl-nav:
+    <<: *base
+    container_name: wafl-nav
+    depends_on:
+      - wafl-sim
+    command: >
+      bash -c "
+        source /opt/ros/humble/setup.bash &&
+        source /WAFL_2027/WAFL2026/Navigation/Simulation/install/setup.bash &&
+        ros2 launch wafl_navigation navigation.launch.py
+      "
+
+  # ── Terminal 3: Caster steering controller ─────────────────
+  wafl-caster:
+    <<: *base
+    container_name: wafl-caster
+    depends_on:
+      - wafl-sim
+    command: >
+      bash -c "
+        source /opt/ros/humble/setup.bash &&
+        source /WAFL_2027/WAFL2026/Navigation/Simulation/install/setup.bash &&
+        ros2 run wafl_navigation caster_controller
+      "
+
+  # ── Terminal 4: RViz ───────────────────────────────────────
+  wafl-rviz:
+    <<: *base
+    container_name: wafl-rviz
+    depends_on:
+      - wafl-sim
+    command: >
+      bash -c "
+        source /opt/ros/humble/setup.bash &&
+        source /WAFL_2027/WAFL2026/Localization/Simulation/install/setup.bash &&
+        ros2 run rviz2 rviz2 -d \$$(ros2 pkg prefix nav2_bringup)/share/nav2_bringup/rviz/nav2_default_view.rviz
+      "
