@@ -1,0 +1,31 @@
+[1.522s] Invoking command in '/home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation': PYTHONPATH=/home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation/build --no-deps symlink_data
+[1.956s] running develop
+[2.263s] running egg_info
+[2.263s] creating wafl_navigation.egg-info
+[2.264s] writing wafl_navigation.egg-info/PKG-INFO
+[2.266s] writing dependency_links to wafl_navigation.egg-info/dependency_links.txt
+[2.266s] writing entry points to wafl_navigation.egg-info/entry_points.txt
+[2.267s] writing requirements to wafl_navigation.egg-info/requires.txt
+[2.267s] writing top-level names to wafl_navigation.egg-info/top_level.txt
+[2.267s] writing manifest file 'wafl_navigation.egg-info/SOURCES.txt'
+[2.270s] reading manifest file 'wafl_navigation.egg-info/SOURCES.txt'
+[2.271s] writing manifest file 'wafl_navigation.egg-info/SOURCES.txt'
+[2.340s] running build_ext
+[2.340s] Creating /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/lib/python3.10/site-packages/wafl-navigation.egg-link (link to .)
+[2.342s] Installing caster_controller script to /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/lib/wafl_navigation
+[2.342s] 
+[2.342s] Installed /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation
+[2.342s] running symlink_data
+[2.342s] creating /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/ament_index
+[2.343s] creating /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/ament_index/resource_index
+[2.343s] creating /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/ament_index/resource_index/packages
+[2.343s] symbolically linking /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation/resource/wafl_navigation -> /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/ament_index/resource_index/packages
+[2.343s] symbolically linking /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation/package.xml -> /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/wafl_navigation
+[2.343s] creating /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/wafl_navigation/launch
+[2.343s] symbolically linking /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation/launch/navigation.launch.py -> /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/wafl_navigation/launch
+[2.343s] creating /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/wafl_navigation/config
+[2.343s] symbolically linking /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation/config/nav2_params.yaml -> /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/wafl_navigation/config
+[2.343s] creating /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/wafl_navigation/maps
+[2.343s] symbolically linking /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation/maps/my_map.pgm -> /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/wafl_navigation/maps
+[2.343s] symbolically linking /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation/maps/my_map.yaml -> /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/wafl_navigation/maps
+[2.431s] Invoked command in '/home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation' returned '0': PYTHONPATH=/home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation/build --no-deps symlink_data

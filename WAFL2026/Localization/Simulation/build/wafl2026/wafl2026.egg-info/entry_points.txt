@@ -1,0 +1,3 @@
+[console_scripts]
+odom_covariance_fix = wafl2026.odom_covariance_fix:main
+

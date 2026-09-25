@@ -1,7 +1,7 @@
-# WAFL 2025 — Launch Guide
+# WAFL 2026 — Launch Guide
 
 > **Start here if you just cloned this repo.**  
-> No ROS installation required — everything runs inside Docker.
+> Requires ROS 2 Humble + Ignition Gazebo — no Docker needed.
 
 ---
 
@@ -9,220 +9,328 @@
 
 | Requirement | Notes |
 |-------------|-------|
-| Linux (Ubuntu 20.04 or 22.04) | Windows/macOS not supported for GUI |
-| Docker Engine | Install guide below |
+| Linux (Ubuntu 22.04) | Windows/macOS not supported for GUI |
+| ROS 2 Humble | Install guide below |
+| Ignition Gazebo | Installed via `ros-humble-ros-gz` |
+| Nav2 | Installed via `ros-humble-nav2-*` |
 | A monitor / desktop | GUI windows won't work on a headless server |
 
 ---
 
-## Step 1 — Install Docker (skip if already installed)
+## Step 1 — Install ROS 2 Humble (skip if already installed)
 
 ```bash
-# Install Docker
+# Set locale
+sudo apt update && sudo apt install locales -y
+sudo locale-gen en_US en_US.UTF-8
+sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+
+# Add ROS 2 apt repo
+sudo apt install software-properties-common curl -y
+sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
+  -o /usr/share/keyrings/ros-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] \
+  http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" \
+  | sudo tee /etc/apt/sources.list.d/ros2.list
+
+# Install
 sudo apt update
-sudo apt install -y docker.io
-
-# Allow your user to run Docker without sudo
-sudo usermod -aG docker $USER
-
-# Apply group change (or log out and back in)
-newgrp docker
-
-# Verify
-docker --version
+sudo apt install -y ros-humble-desktop
 ```
 
 ---
 
-## Step 2 — Clone the repo
+## Step 2 — Install simulation dependencies
 
 ```bash
-git clone <repo-url>
-cd <repo-folder-name>
+sudo apt install -y \
+  ros-humble-ros-gz \
+  ros-humble-ros-gz-bridge \
+  ros-humble-ros-gz-sim \
+  ros-humble-nav2-bringup \
+  ros-humble-nav2-map-server \
+  ros-humble-nav2-amcl \
+  ros-humble-nav2-controller \
+  ros-humble-nav2-planner \
+  ros-humble-nav2-behaviors \
+  ros-humble-nav2-bt-navigator \
+  ros-humble-nav2-lifecycle-manager \
+  ros-humble-robot-localization \
+  ros-humble-robot-state-publisher \
+  ros-humble-joint-state-publisher \
+  ros-humble-rplidar-ros \
+  python3-colcon-common-extensions
 ```
-
-> WARNING: **All commands in this guide must be run from inside the repo root folder** (the folder you just `cd` into above — the one that contains `docker/` and `LAUNCH.md`). Do not run them from inside a subfolder.
 
 ---
 
-## Step 3 — Allow GUI windows
-
-Run this **once per login session** (every time you restart your PC):
+## Step 3 — Clone the repo
 
 ```bash
-xhost +local:docker
+git clone https://github.com/martinmelad1/WAFL_2027.git
+cd WAFL_2027
 ```
 
----
-
-## Step 4 — Build the Docker image
-
-Run this **once** (first time only), from the **repo root folder**:
+> All commands from this point on assume you are inside the cloned folder.  
+> They use `$REPO` as a shortcut — set it once per terminal session:
 
 ```bash
-# Make sure you are in the repo root (contains docker/ and LAUNCH.md)
-bash docker/run.sh build
+REPO=$(git rev-parse --show-toplevel)
 ```
 
-> [time] Takes ~10 minutes — downloads Ubuntu 20.04 + ROS Noetic + Gazebo (~2 GB total).  
-> After the first build, subsequent builds are instant (cached).
-
-You should see at the end:
-```
-OK:  Build complete! Image: wafl2025:latest
-```
+> Run this in **every new terminal** you open before using any `$REPO/...` path below.
 
 ---
 
-## Step 5 — Run it
+## Step 4 — Build both workspaces (first time only)
 
-> All commands below must be run from the **repo root folder** (same place you ran `build`).
+The repo has **two separate ROS 2 workspaces**:
 
-### See the robot model (GUI with joint sliders)
+```
+WAFL2026/Localization/Simulation/   ← wafl2026 package  (Gazebo + AMCL + EKF)
+WAFL2026/Navigation/Simulation/     ← wafl_navigation package (Nav2 + caster controller)
+```
+
+### 4a — Build the localization/simulation workspace
 
 ```bash
-bash docker/run.sh gui
+source /opt/ros/humble/setup.bash
+
+cd $REPO/WAFL2026/Localization/Simulation
+rosdep install --from-paths src --ignore-src -r -y
+colcon build --symlink-install
 ```
 
-Opens **RViz** showing the full 3D forklift model. Use the slider panel to move any joint interactively.
-
----
-
-### See the robot in Gazebo simulation
+### 4b — Build the navigation workspace
 
 ```bash
-bash docker/run.sh gazebo
+source /opt/ros/humble/setup.bash
+
+cd $REPO/WAFL2026/Navigation/Simulation
+rosdep install --from-paths wafl_navigation --ignore-src -r -y
+colcon build --symlink-install
 ```
 
-Opens **Gazebo** with the robot spawned in an empty world. Also opens RViz.
+> You only need to build **once**. After that, skip straight to Step 5 every time.
 
 ---
 
-### Drive the robot manually with the keyboard ← *Start here for testing*
+## Step 5 — Run it (open 4 terminals)
+
+> ⚠️ **Kill any stale Gazebo instances first** — do this before every launch session:
+> ```bash
+> killall -9 ign; pkill -f gazebo
+> ```
+
+---
+
+### Terminal 1 — Gazebo simulation (Ignition + AMCL + EKF)
 
 ```bash
-bash docker/run.sh teleop
+REPO=$(git -C ~/WAFL_2027 rev-parse --show-toplevel)   # adjust path if you cloned elsewhere
+source /opt/ros/humble/setup.bash
+source $REPO/WAFL2026/Localization/Simulation/install/setup.bash
+
+cd $REPO/WAFL2026/Localization/Simulation
+LIBGL_ALWAYS_SOFTWARE=1 ros2 launch wafl2026 humble4.launch.py
 ```
 
-Opens Gazebo + RViz, then starts keyboard teleoperation in the same terminal.
-
-**Click the terminal window, then use:**
-
-| Key | Action |
-|-----|--------|
-| `W` | Move forward |
-| `S` | Move backward |
-| `A` | Turn left |
-| `D` | Turn right |
-| `Q` | Strafe left (crab mode) |
-| `E` | Strafe right (crab mode) |
-| `Space` | **Emergency STOP** |
-| `Z` | Zero / reset steering |
-| `+` | Speed up (+0.1 m/s) |
-| `-` | Slow down (−0.1 m/s) |
-| `Ctrl-C` | Exit |
-
-> **Wait ~5–6 seconds** after the command for Gazebo to fully load before typing keys.
+> ⏱️ Wait **~25 seconds** for the full startup sequence:  
+> Gazebo → bridge (t=3s) → robot spawns (t=6s) → sensor fix (t=7s) → map server (t=9s) → AMCL activates (t=18s)  
+> You will see the forklift appear in the Gazebo window.
 
 ---
 
-### Open a shell inside the container (for debugging)
+### Terminal 2 — Nav2 navigation stack
 
 ```bash
-bash docker/run.sh shell
-```
+REPO=$(git -C ~/WAFL_2027 rev-parse --show-toplevel)
+source /opt/ros/humble/setup.bash
+source $REPO/WAFL2026/Navigation/Simulation/install/setup.bash
 
-Drops you into a bash shell with ROS fully sourced. You can run any `rostopic`, `rosnode`, `roslaunch` commands manually.
+ros2 launch wafl_navigation navigation.launch.py
+```
 
 ---
 
-## All available commands
+### Terminal 3 — Caster steering controller
 
+```bash
+REPO=$(git -C ~/WAFL_2027 rev-parse --show-toplevel)
+source /opt/ros/humble/setup.bash
+source $REPO/WAFL2026/Navigation/Simulation/install/setup.bash
+
+ros2 run wafl_navigation caster_controller
 ```
-bash docker/run.sh build    # Build image (once)
-bash docker/run.sh gui      # URDF viewer + joint sliders
-bash docker/run.sh gazebo   # Gazebo simulation
-bash docker/run.sh teleop   # Gazebo + keyboard driving  ← best for testing
-bash docker/run.sh slam     # Hector SLAM (needs real LiDAR)
-bash docker/run.sh nav      # Autonomous navigation (needs real LiDAR)
-bash docker/run.sh shell    # Interactive shell
+
+> ℹ️ **This node has no GUI.** It prints one line (`Caster Controller Started`) and then runs silently.  
+> That is correct — it listens on `/cmd_vel` and publishes steering angles to Gazebo.  
+> You will see log lines like `v=0.30 w=0.15 caster=14.0 deg` only when the robot is moving.
+
+---
+
+### Terminal 4 — RViz
+
+> ⚠️ You must source **both** the ROS install AND the wafl2026 workspace.  
+> If you only source `/opt/ros/humble`, RViz throws `Package [wafl2026] does not exist` errors and the robot model won't load.
+
+```bash
+REPO=$(git -C ~/WAFL_2027 rev-parse --show-toplevel)
+source /opt/ros/humble/setup.bash
+source $REPO/WAFL2026/Localization/Simulation/install/setup.bash
+
+ros2 run rviz2 rviz2 -d $(ros2 pkg prefix nav2_bringup)/share/nav2_bringup/rviz/nav2_default_view.rviz
+```
+
+> ℹ️ The `Warning: Ignoring XDG_SESSION_TYPE=wayland` and `GLSL link result` messages are harmless — ignore them.
+
+---
+
+## Step 6 — View the robot in RViz
+
+### Flat top-down map view (default — recommended)
+
+In RViz:
+1. Top menu → **Panels → Views** (a Views panel opens on the right)
+2. Change **Type** from `Orbit` to **`TopDownOrtho`**
+3. Click **Zero** → view snaps flat looking straight down
+
+In TopDownOrtho mode: **left-drag pans**, scroll wheel zooms. No 3D rotation.
+
+---
+
+### 3D robot model view
+
+1. In the left **Displays** panel, find **RobotModel** → make sure it is **checked**
+2. Set **Fixed Frame** (top of Displays panel) to `odom` (or `map` once AMCL is active)
+3. The full 3D forklift appears in the viewport
+
+| Action | Mouse |
+|--------|-------|
+| Orbit (rotate) | Left click + drag |
+| Pan | Middle click + drag |
+| Zoom | Scroll wheel |
+| Focus on robot | `F` |
+
+> ⚠️ If RobotModel shows **"Errors loading geometries"** → you launched RViz without sourcing the workspace. Relaunch Terminal 4 with both `source` lines.
+
+---
+
+## Step 7 — Send a navigation goal
+
+1. In RViz toolbar → click **2D Pose Estimate** → click the robot's position on the map → drag arrow in the direction it faces → a green particle cloud confirms AMCL is active
+2. Click **Nav2 Goal** → click anywhere on the map → drag to set heading → the robot plans a path and drives automatically
+
+---
+
+## Step 8 — Manual Control GUI (optional)
+
+A PyQt5 dashboard for manually controlling drive distance, steering angle, and fork lift. Primarily for real-hardware testing.
+
+### Install PyQt5 (once)
+
+```bash
+pip3 install PyQt5
+```
+
+### Launch
+
+```bash
+REPO=$(git -C ~/WAFL_2027 rev-parse --show-toplevel)
+source /opt/ros/humble/setup.bash
+source $REPO/WAFL2026/Localization/Simulation/install/setup.bash
+
+python3 $REPO/WAFL2026/Integration/wafl_manual_dashboard.py
+```
+
+| Panel | What it does |
+|-------|-------------|
+| **Move Control** | Type a distance (float) → `Publish Once` / `Start Continuous` / `Stop Continuous` |
+| **Steering** | Type an angle (±float degrees) → `Publish Steering` → `/target_angle` (real ESP32) |
+| **Lifting Mechanism** | `UP` / `DOWN` / `STOP` → sends 1 / 2 / 0 to `/lift_cmd` (real ESP32) |
+| **Start micro-ROS Agent** | Starts UDP bridge for ESP32s — **real hardware only**, not needed in simulation |
+
+> ⚠️ In **simulation**, the Move and Steering panels are not wired to the Gazebo robot (they target the real ESP32 topics). Use the RViz **Nav2 Goal** button to drive the simulated robot.
+
+---
+
+## If you cloned to a different location
+
+All commands above use `git -C ~/WAFL_2027 rev-parse --show-toplevel` to find the repo.  
+If you cloned somewhere else (e.g. `~/projects/WAFL_2027`), either:
+
+**Option A** — replace `~/WAFL_2027` in every command with your actual path, or  
+**Option B** — set `REPO` manually at the start of each terminal:
+
+```bash
+REPO=/path/to/your/clone/of/WAFL_2027
 ```
 
 ---
 
 ## Troubleshooting
 
-### "Cannot connect to display" / windows don't open
+### ❌ Gazebo opens but robot doesn't appear
+Wait up to 30 seconds — the timed startup sequence takes ~22s. If still missing, check Terminal 1 for errors.
 
+### ❌ Map doesn't appear in RViz
+The map server is a lifecycle node. If it didn't auto-activate:
 ```bash
-# Run this first, then retry:
-xhost +local:docker
+ros2 lifecycle set /map_server configure
+ros2 lifecycle set /map_server activate
 ```
 
-### "docker: Got permission denied"
-
+### ❌ Gazebo hangs / freezes
 ```bash
-sudo usermod -aG docker $USER
-newgrp docker   # or log out and back in
+killall -9 ign
+LIBGL_ALWAYS_SOFTWARE=1 ign gazebo -r
+```
+Then re-run Terminal 1.
+
+### ❌ `Package [wafl2026] does not exist` — meshes missing in RViz
+You only sourced `/opt/ros/humble`. Close RViz and relaunch Terminal 4 with **both** `source` lines.
+
+### ❌ `Package 'wafl2026' not found` (other terminals)
+```bash
+source $REPO/WAFL2026/Localization/Simulation/install/setup.bash
 ```
 
-### Gazebo opens but robot doesn't appear
-
-Wait 10–15 seconds. Gazebo can be slow to spawn models on the first run.  
-If it still doesn't appear, check the terminal for error messages.
-
-### "Image not found" / "No such image"
-
-You haven't built yet. Run:
+### ❌ `Package 'wafl_navigation' not found`
 ```bash
-bash docker/run.sh build
+source $REPO/WAFL2026/Navigation/Simulation/install/setup.bash
 ```
 
-### Teleop keys don't do anything
+### ❌ Caster controller terminal looks frozen / no output
+That is normal — it is waiting for `/cmd_vel` from Nav2. It will print angles once the robot moves.
 
-Make sure you clicked the **terminal window** (not the Gazebo or RViz window) before pressing keys. The keyboard listener reads from the terminal where you launched `teleop`.
+### ❌ EKF NaN / covariance errors on startup
+Expected — the launch file has a timed startup to prevent this. Wait the full ~25s before diagnosing.
 
-### Build fails midway (network error)
+### ❌ Nav2 panel shows "unknown" for Navigation / Localization
+The `wafl_navigation` workspace was not built or not sourced. Build it (Step 4b) then relaunch Terminal 2.
 
-Just run `build` again — Docker caches completed steps, so it will resume from where it failed.
+### ❌ VM / slow machine — Gazebo is very laggy
+
+| Setting | Value |
+|---------|-------|
+| RAM | 16 GB |
+| Processors | 4 |
+| Graphics Memory | 128 MB |
+| Accelerate 3D Graphics | ON |
 
 ---
 
-## What's inside the Docker image
+## What's inside the simulation
 
 | Component | Version |
 |-----------|---------|
-| OS | Ubuntu 20.04 LTS |
-| ROS | Noetic (desktop-full) |
-| Gazebo | 11 |
-| Python | 3.8 |
-| WAFL2025 package | Built with catkin_make |
-
-> **Note:** ROS 1 Noetic reached end-of-life in May 2025. This only means no new official updates — the software works perfectly and everything is already installed inside the image.
+| OS | Ubuntu 22.04 LTS |
+| ROS | Humble |
+| Simulator | Ignition Gazebo (Fortress) |
+| Localization | AMCL + EKF (robot_localization) |
+| Navigation | Nav2 (DWB + NavFn) |
 
 ---
 
-## For software testing — what to verify
-
-| Test | How |
-|------|-----|
-| Robot model loads correctly | `bash docker/run.sh gui` — check RViz shows the full forklift |
-| Gazebo simulation works | `bash docker/run.sh gazebo` — robot appears in world |
-| Manual control works | `bash docker/run.sh teleop` — robot responds to WASD keys |
-| ROS nodes are running | `bash docker/run.sh shell` then `rosnode list` |
-| Topics are publishing | `bash docker/run.sh shell` then `rostopic list` |
-
----
-
-## File structure (docker/)
-
-```
-docker/
-├── Dockerfile       # Builds the ROS Noetic environment + WAFL2025 package
-├── entrypoint.sh    # Auto-sources ROS + workspace on container start
-└── run.sh           # User-friendly launcher script
-```
-
----
-
-*For full technical documentation, see [WAFL2025/README.md](WAFL2025-forklift2425-patch-manual-mapping/WAFL2025/README.md)*
+*For full architecture documentation see [WAFL2026_Architecture.md](WAFL2026_Architecture.md)*  
+*For full project README see [WAFL2026/README.md](WAFL2026/README.md)*

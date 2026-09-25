@@ -1,0 +1,3 @@
+[console_scripts]
+caster_controller = wafl_navigation.caster_controller:main
+

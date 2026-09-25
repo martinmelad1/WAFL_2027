@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>pallet_vision</name>
+  <version>0.0.1</version>
+  <description>Pallet ArUco detection, Nav2 dispatch, and YOLO/TensorRT fine-alignment.</description>
+  <maintainer email="ahmed@todo.todo">ahmed</maintainer>
+  <license>MIT</license>
+
+  <!-- Core ROS2 deps -->
+  <depend>rclpy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>visualization_msgs</depend>
+  <depend>nav2_msgs</depend>
+  <depend>cv_bridge</depend>
+
+  <!-- For tf2 integration if/when added -->
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>tf2_geometry_msgs</exec_depend>
+
+  <!-- Kinect driver runtime dep -->
+  <exec_depend>kinect_ros2</exec_depend>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

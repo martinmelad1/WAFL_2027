@@ -1,0 +1,62 @@
+running develop
+running egg_info
+creating wafl2026.egg-info
+writing wafl2026.egg-info/PKG-INFO
+writing dependency_links to wafl2026.egg-info/dependency_links.txt
+writing entry points to wafl2026.egg-info/entry_points.txt
+writing requirements to wafl2026.egg-info/requires.txt
+writing top-level names to wafl2026.egg-info/top_level.txt
+writing manifest file 'wafl2026.egg-info/SOURCES.txt'
+reading manifest file 'wafl2026.egg-info/SOURCES.txt'
+writing manifest file 'wafl2026.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/lib/python3.10/site-packages/wafl2026.egg-link (link to .)
+Installing odom_covariance_fix script to /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/lib/wafl2026
+
+Installed /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026
+running symlink_data
+creating /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/ament_index
+creating /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/ament_index/resource_index
+creating /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/ament_index/resource_index/packages
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/resource/wafl2026 -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/ament_index/resource_index/packages
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/package.xml -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026
+creating /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/urdf
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/urdf/wafl2025.urdf -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/urdf
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/urdf/wafl2025old.urdf -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/urdf
+creating /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/meshes
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/meshes/base_link.STL -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/meshes
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/meshes/right_web.STL -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/meshes
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/meshes/base_link(without).STL -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/meshes
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/meshes/left_wheel.STL -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/meshes
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/meshes/left_web.STL -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/meshes
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/meshes/castor_wheel.STL -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/meshes
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/meshes/right_wheel.STL -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/meshes
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/meshes/hokuyo.dae -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/meshes
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/meshes/castor.STL -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/meshes
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/meshes/base_footprint.STL -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/meshes
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/meshes/kinect.dae -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/meshes
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/meshes/base_link(old).STL -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/meshes
+creating /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/materials
+creating /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/materials/textures
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/materials/textures/kinect.png -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/materials/textures
+creating /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/launch
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/launch/gazebo.launch.py -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/launch
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/launch/humble.launch.py -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/launch
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/launch/view_urdf.launch.py -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/launch
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/launch/humble4.launch (copy).py -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/launch
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/launch/humble4.launch.py -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/launch
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/launch/gazebo_humble.launch.py -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/launch
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/launch/humble2.launch.py -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/launch
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/launch/humble3.launch.py -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/launch
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/launch/humble4.launch (another copy).py -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/launch
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/launch/display.launch.py -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/launch
+creating /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/config
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/config/ekf.yaml -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/config
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/config/ekf_old.yaml -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/config
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/config/Tab_ekf.yaml -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/config
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/config/amcl_config.yaml -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/config
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/config/ekf (copy).yaml -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/config
+creating /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/map
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/map/my_map.pgm -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/map
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/map/my_map.sdf -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/map
+symbolically linking /home/martin/gp/repo26/WAFL2026/Localization/Simulation/build/wafl2026/map/my_map.yaml -> /home/martin/gp/repo26/WAFL2026/Localization/Simulation/install/wafl2026/share/wafl2026/map

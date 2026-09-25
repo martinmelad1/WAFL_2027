@@ -1,0 +1,60 @@
+[0.000000] (-) TimerEvent: {}
+[0.003659] (wafl_navigation) JobQueued: {'identifier': 'wafl_navigation', 'dependencies': OrderedDict()}
+[0.003722] (wafl_navigation) JobStarted: {'identifier': 'wafl_navigation'}
+[0.099535] (-) TimerEvent: {}
+[0.199857] (-) TimerEvent: {}
+[0.300173] (-) TimerEvent: {}
+[0.400512] (-) TimerEvent: {}
+[0.500774] (-) TimerEvent: {}
+[0.605476] (-) TimerEvent: {}
+[0.706456] (-) TimerEvent: {}
+[0.807531] (-) TimerEvent: {}
+[0.907814] (-) TimerEvent: {}
+[1.008104] (-) TimerEvent: {}
+[1.108455] (-) TimerEvent: {}
+[1.209852] (-) TimerEvent: {}
+[1.310281] (-) TimerEvent: {}
+[1.411021] (-) TimerEvent: {}
+[1.511311] (-) TimerEvent: {}
+[1.524906] (wafl_navigation) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'develop', '--editable', '--build-directory', '/home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation/build', '--no-deps', 'symlink_data'], 'cwd': '/home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation', 'env': OrderedDict([('GJS_DEBUG_TOPICS', 'JS ERROR;JS LOG'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('VSCODE_CWD', '/home/martin'), ('USER', 'martin'), ('ANTIGRAVITY_SOURCE_METADATA', '{"tool":{"conversationId":"0960b9b1-bfdf-4509-8a05-f6df97eb3512","stepIndex":66,"toolCall":{"id":"toolu_vrtx_014uUGYe54GHc88t8L9RVsWX","name":"run_command","argumentsJson":"{\\"CommandLine\\":\\"bash -c \\\\\\"\\\\nsource /opt/ros/humble/setup.bash\\\\ncd /home/martin/gp/repo26/WAFL2026/Navigation/Simulation\\\\ncolcon build --symlink-install 2\\\\u003e\\\\u00261\\\\n\\\\\\"\\\\n\\",\\"Cwd\\":\\"/home/martin/gp/repo26/WAFL2026/Navigation/Simulation\\",\\"IsDaemon\\":false,\\"WaitMsBeforeAsync\\":30000,\\"toolAction\\":\\"Building wafl_navigation workspace\\",\\"toolSummary\\":\\"Building navigation workspace\\"}","originalName":"run_command"}}}'), ('LC_TIME', 'en_US.UTF-8'), ('VSCODE_NLS_CONFIG', '{"userLocale":"en-us","osLocale":"en-us","resolvedLanguage":"en","defaultMessagesFile":"/home/martin/apps/anti_gravity/Antigravity IDE/resources/app/out/nls.messages.json","locale":"en-us","availableLanguages":{}}'), ('XDG_SESSION_TYPE', 'wayland'), ('ANTIGRAVITY_AGENTAPI_EXE', '/home/martin/apps/anti_gravity/Antigravity IDE/resources/app/extensions/antigravity/bin/language_server_linux_x64'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/usr/local/cuda/lib64:/home/martin/ros2_ws/install/roar_msgs/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/opt/libphidget22/lib:/opt/ros/humble/lib'), ('HOME', '/home/martin'), ('CHROME_DESKTOP', 'antigravity-ide.desktop'), ('OLDPWD', '/home/martin/gp/repo26/WAFL2026/Navigation/Simulation'), ('DESKTOP_SESSION', 'ubuntu'), ('NVM_BIN', '/home/martin/.nvm/versions/node/v20.20.2/bin'), ('NVM_INC', '/home/martin/.nvm/versions/node/v20.20.2/include/node'), ('VSCODE_IPC_HOOK', '/run/user/1000/vscode-422e8265-1.10-main.sock'), ('GIO_LAUNCHED_DESKTOP_FILE', '/home/martin/Desktop/antigravity.desktop'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('PAGER', 'cat'), ('LC_MONETARY', 'en_US.UTF-8'), ('MANAGERPID', '2126'), ('ANTIGRAVITY_SAFECLIS_SOURCE', '/home/martin/.gemini/antigravity-ide/bin/safeclis/src'), ('SYSTEMD_EXEC_PID', '2352'), ('IM_CONFIG_CHECK_ENV', '1'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('ANTIGRAVITY_AGENT', '1'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '3147'), ('NVM_DIR', '/home/martin/.nvm'), ('IM_CONFIG_PHASE', '1'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/martin/ros2_ws/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'martin'), ('IGN_GAZEBO_MODEL_PATH', '/opt/ros/humble/share'), ('JOURNAL_STREAM', '8:15777'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'martin'), ('TERM', 'dumb'), ('GAZEBO_MODEL_PATH', '/opt/ros/humble/share'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('FC_FONTATIONS', '1'), ('ROS_LOCALHOST_ONLY', '0'), ('ANTIGRAVITY_LS_VERSION', 'ide-2.4.5'), ('ANTIGRAVITY_EDITOR_APP_ROOT', '/home/martin/apps/anti_gravity/Antigravity IDE/resources/app'), ('PATH', '/home/martin/.gemini/antigravity-ide/bin:/home/martin/.local/bin:/home/martin/.nvm/versions/node/v20.20.2/bin:/usr/local/cuda/bin:/opt/ros/humble/bin:/home/martin/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/martin:@/tmp/.ICE-unix/2280,unix/martin:/tmp/.ICE-unix/2280'), ('INVOCATION_ID', 'e6059a92e43a42cea7af6f1ee313fc02'), ('PAPERSIZE', 'letter'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'en_US.UTF-8'), ('GNOME_SETUP_DISPLAY', ':1'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('GDK_BACKEND', 'wayland'), ('DISPLAY', ':0'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('ANTIGRAVITY_CONVERSATION_ID', '0960b9b1-bfdf-4509-8a05-f6df97eb3512'), ('LC_TELEPHONE', 'en_US.UTF-8'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/.mutter-Xwaylandauth.DWW8V3'), ('LS_COLORS', ''), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/home/martin/ros2_ws/install/roar_msgs:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('ANTIGRAVITY_LS_ADDRESS', 'localhost:42553'), ('LC_NAME', 'en_US.UTF-8'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('IGN_GAZEBO_RESOURCE_PATH', '/opt/ros/humble/share'), ('LC_MEASUREMENT', 'en_US.UTF-8'), ('GAZEBO_RESOURCE_PATH', '/opt/ros/humble/share'), ('GJS_DEBUG_OUTPUT', 'stderr'), ('LC_IDENTIFICATION', 'en_US.UTF-8'), ('GIT_PAGER', 'cat'), ('QT_IM_MODULE', 'ibus'), ('ANTIGRAVITY_TRAJECTORY_ID', '5c0e3be9-c155-4cbf-841a-3a1e996771d2'), ('PWD', '/home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('VSCODE_CODE_CACHE_PATH', '/home/martin/.config/Antigravity IDE/CachedData/ecfbad74d93962fc8ca485d93ab9b4f3d4cb6cf8'), ('NVM_CD_FLAGS', ''), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/lib/python3.10/site-packages:/home/martin/ros2_ws/install/roar_msgs/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('LC_NUMERIC', 'en_US.UTF-8'), ('LC_PAPER', 'en_US.UTF-8'), ('COLCON', '1'), ('ANTIGRAVITY_CSRF_TOKEN', 'ab062308-18e2-40b3-b4d8-da5e81f73f71'), ('CMAKE_PREFIX_PATH', '/home/martin/ros2_ws/install/roar_msgs'), ('VSCODE_PID', '3147')]), 'shell': False}
+[1.611417] (-) TimerEvent: {}
+[1.712881] (-) TimerEvent: {}
+[1.813263] (-) TimerEvent: {}
+[1.913570] (-) TimerEvent: {}
+[1.959379] (wafl_navigation) StdoutLine: {'line': b'running develop\n'}
+[2.013669] (-) TimerEvent: {}
+[2.114004] (-) TimerEvent: {}
+[2.215717] (-) TimerEvent: {}
+[2.266850] (wafl_navigation) StdoutLine: {'line': b'running egg_info\n'}
+[2.267017] (wafl_navigation) StdoutLine: {'line': b'creating wafl_navigation.egg-info\n'}
+[2.267359] (wafl_navigation) StdoutLine: {'line': b'writing wafl_navigation.egg-info/PKG-INFO\n'}
+[2.269822] (wafl_navigation) StdoutLine: {'line': b'writing dependency_links to wafl_navigation.egg-info/dependency_links.txt\n'}
+[2.270103] (wafl_navigation) StdoutLine: {'line': b'writing entry points to wafl_navigation.egg-info/entry_points.txt\n'}
+[2.270204] (wafl_navigation) StdoutLine: {'line': b'writing requirements to wafl_navigation.egg-info/requires.txt\n'}
+[2.270271] (wafl_navigation) StdoutLine: {'line': b'writing top-level names to wafl_navigation.egg-info/top_level.txt\n'}
+[2.270332] (wafl_navigation) StdoutLine: {'line': b"writing manifest file 'wafl_navigation.egg-info/SOURCES.txt'\n"}
+[2.273483] (wafl_navigation) StdoutLine: {'line': b"reading manifest file 'wafl_navigation.egg-info/SOURCES.txt'\n"}
+[2.274245] (wafl_navigation) StdoutLine: {'line': b"writing manifest file 'wafl_navigation.egg-info/SOURCES.txt'\n"}
+[2.318464] (-) TimerEvent: {}
+[2.343391] (wafl_navigation) StdoutLine: {'line': b'running build_ext\n'}
+[2.343665] (wafl_navigation) StdoutLine: {'line': b'Creating /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/lib/python3.10/site-packages/wafl-navigation.egg-link (link to .)\n'}
+[2.345475] (wafl_navigation) StdoutLine: {'line': b'Installing caster_controller script to /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/lib/wafl_navigation\n'}
+[2.345707] (wafl_navigation) StdoutLine: {'line': b'\n'}
+[2.345836] (wafl_navigation) StdoutLine: {'line': b'Installed /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation\n'}
+[2.345969] (wafl_navigation) StdoutLine: {'line': b'running symlink_data\n'}
+[2.346044] (wafl_navigation) StdoutLine: {'line': b'creating /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/ament_index\n'}
+[2.346153] (wafl_navigation) StdoutLine: {'line': b'creating /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/ament_index/resource_index\n'}
+[2.346278] (wafl_navigation) StdoutLine: {'line': b'creating /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/ament_index/resource_index/packages\n'}
+[2.346348] (wafl_navigation) StdoutLine: {'line': b'symbolically linking /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation/resource/wafl_navigation -> /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/ament_index/resource_index/packages\n'}
+[2.346470] (wafl_navigation) StdoutLine: {'line': b'symbolically linking /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation/package.xml -> /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/wafl_navigation\n'}
+[2.346556] (wafl_navigation) StdoutLine: {'line': b'creating /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/wafl_navigation/launch\n'}
+[2.346627] (wafl_navigation) StdoutLine: {'line': b'symbolically linking /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation/launch/navigation.launch.py -> /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/wafl_navigation/launch\n'}
+[2.346703] (wafl_navigation) StdoutLine: {'line': b'creating /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/wafl_navigation/config\n'}
+[2.346766] (wafl_navigation) StdoutLine: {'line': b'symbolically linking /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation/config/nav2_params.yaml -> /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/wafl_navigation/config\n'}
+[2.346869] (wafl_navigation) StdoutLine: {'line': b'creating /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/wafl_navigation/maps\n'}
+[2.346961] (wafl_navigation) StdoutLine: {'line': b'symbolically linking /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation/maps/my_map.pgm -> /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/wafl_navigation/maps\n'}
+[2.347026] (wafl_navigation) StdoutLine: {'line': b'symbolically linking /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/build/wafl_navigation/maps/my_map.yaml -> /home/martin/gp/repo26/WAFL2026/Navigation/Simulation/install/wafl_navigation/share/wafl_navigation/maps\n'}
+[2.420358] (-) TimerEvent: {}
+[2.434151] (wafl_navigation) CommandEnded: {'returncode': 0}
+[2.454694] (wafl_navigation) JobEnded: {'identifier': 'wafl_navigation', 'rc': 0}
+[2.457021] (-) EventReactorShutdown: {}

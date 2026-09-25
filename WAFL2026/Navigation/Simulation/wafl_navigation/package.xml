@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<package format="3">
+
+  <name>wafl_navigation</name>
+  <version>0.0.0</version>
+
+  <description>Navigation package</description>
+
+  <maintainer email="test@test.com">mariam</maintainer>
+
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclpy</depend>
+
+  <depend>nav2_common</depend>
+  <depend>nav2_controller</depend>
+  <depend>nav2_planner</depend>
+  <depend>nav2_behaviors</depend>
+  <depend>nav2_bt_navigator</depend>
+  <depend>nav2_lifecycle_manager</depend>
+
+  <depend>nav2_msgs</depend>
+
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+
+</package>
