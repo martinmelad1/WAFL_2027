@@ -1,10 +1,10 @@
 <mxfile host="app.diagrams.net">
   <diagram name="WAFL 2027 Architecture" id="wafl2027">
-    <mxGraphModel dx="3307" dy="1873" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="3000" pageHeight="2000" background="#ffffff" math="0" shadow="0">
+    <mxGraphModel dx="2334" dy="1322" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="3000" pageHeight="2000" background="#ffffff" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="T69wGVMLv-QBfodi3Myg-1" parent="1" style="whiteSpace=wrap;html=1;opacity=60;" value="" vertex="1">
+        <mxCell id="T69wGVMLv-QBfodi3Myg-1" parent="1" style="whiteSpace=wrap;html=1;opacity=60;" value=" " vertex="1">
           <mxGeometry height="1866" width="2784" x="192" y="75" as="geometry" />
         </mxCell>
         <mxCell id="c_SIM" parent="1" style="rounded=1;arcSize=2;whiteSpace=wrap;html=1;fillColor=#fff8ec;strokeColor=#e8590c;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=14;spacingTop=6;fontStyle=1;fontSize=16;fontColor=#222222;container=1;collapsible=0;recursiveResize=0;movable=1;dashed=1;dashPattern=6 3" value="Simulation  (wafl_simulation — Gazebo Harmonic)" vertex="1">
@@ -13,7 +13,7 @@
         <mxCell id="GZ" parent="c_SIM" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#fff0d9;strokeColor=#e8590c;fontColor=#4a2100;strokeWidth=2;fontSize=16;fontStyle=1;dashed=1;dashPattern=6 3" value="Gazebo Harmonic&lt;br&gt;warehouse world" vertex="1">
           <mxGeometry height="60" width="190" x="26" y="40" as="geometry" />
         </mxCell>
-        <mxCell id="RGZ" parent="c_SIM" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#fff0d9;strokeColor=#e8590c;fontColor=#4a2100;strokeWidth=2;fontSize=16;fontStyle=1;dashed=1;dashPattern=6 3" value="ros_gz_bridge" vertex="1">
+        <mxCell id="RGZ" parent="c_SIM" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#fff0d9;strokeColor=#e8590c;fontColor=#4a2100;strokeWidth=2;fontSize=16;fontStyle=1;dashed=1;dashPattern=6 3" value="ros_gz_bridge&lt;br&gt;(publishes /clock)" vertex="1">
           <mxGeometry height="60" width="190" x="366" y="40" as="geometry" />
         </mxCell>
         <mxCell id="c_LOC" parent="1" style="rounded=1;arcSize=2;whiteSpace=wrap;html=1;fillColor=#f1f9fe;strokeColor=#1c7ed6;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=14;spacingTop=6;fontStyle=1;fontSize=16;fontColor=#222222;container=1;collapsible=0;recursiveResize=0;movable=1" value="Layer 1 — Localization  (wafl_localization)" vertex="1">
@@ -46,10 +46,10 @@
         <mxCell id="c_NAV" parent="1" style="rounded=1;arcSize=2;whiteSpace=wrap;html=1;fillColor=#f3f5ff;strokeColor=#4c5fd5;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=14;spacingTop=6;fontStyle=1;fontSize=16;fontColor=#222222;container=1;collapsible=0;recursiveResize=0;movable=1" value="Layer 2 — Navigation  (wafl_navigation)" vertex="1">
           <mxGeometry height="120" width="582" x="214" y="882" as="geometry" />
         </mxCell>
-        <mxCell id="NAV2" parent="c_NAV" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#e0e6ff;strokeColor=#4c5fd5;fontColor=#141c4d;strokeWidth=2;fontSize=16;fontStyle=1" value="Nav2 Stack" vertex="1">
+        <mxCell id="NAV2" parent="c_NAV" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#e0e6ff;strokeColor=#4c5fd5;fontColor=#141c4d;strokeWidth=2;fontSize=16;fontStyle=1" value="Nav2 Stack&lt;br&gt;&lt;font style=&quot;font-size:12px;font-weight:normal&quot;&gt;Pure Pursuit / DWB&lt;/font&gt;" vertex="1">
           <mxGeometry height="60" width="190" x="26" y="40" as="geometry" />
         </mxCell>
-        <mxCell id="CC" parent="c_NAV" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#e0e6ff;strokeColor=#4c5fd5;fontColor=#141c4d;strokeWidth=2;fontSize=16;fontStyle=1" value="caster_controller" vertex="1">
+        <mxCell id="CC" parent="c_NAV" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#e0e6ff;strokeColor=#4c5fd5;fontColor=#141c4d;strokeWidth=2;fontSize=16;fontStyle=1" value="base_controller" vertex="1">
           <mxGeometry height="60" width="190" x="366" y="40" as="geometry" />
         </mxCell>
         <mxCell id="c_MISS" parent="1" style="rounded=1;arcSize=2;whiteSpace=wrap;html=1;fillColor=#f2fbf4;strokeColor=#2f9e44;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=14;spacingTop=6;fontStyle=1;fontSize=16;fontColor=#222222;container=1;collapsible=0;recursiveResize=0;movable=1" value="Layer 4 — Mission &amp;amp; WMS  (wafl_mission)" vertex="1">
@@ -178,8 +178,10 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="e10" edge="1" parent="1" source="OCF" style="endArrow=classic;endFill=1;html=1;rounded=0;strokeColor=#e8590c;strokeWidth=1.6;fontSize=15;fontColor=#222222;labelBackgroundColor=#ffffff;exitX=1.000;exitY=0.500;exitPerimeter=0;entryX=0.000;entryY=0.500;entryPerimeter=0;dashed=1" target="EKF" value="/odom_fixed">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="e10" edge="1" parent="1" source="OCF" style="endArrow=classic;endFill=1;html=1;rounded=0;strokeColor=#e8590c;strokeWidth=1.6;fontSize=11;fontColor=#222222;labelBackgroundColor=#ffffff;exitX=1.000;exitY=0.500;exitPerimeter=0;entryX=0.000;entryY=0.500;entryPerimeter=0;dashed=1;startSize=6;" target="EKF" value="/odom_fixed · /imu_fixed">
+          <mxGeometry relative="1" x="-0.0452" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="e11" edge="1" parent="1" source="LIDAR" style="endArrow=classic;endFill=1;html=1;rounded=0;strokeColor=#c92a2a;strokeWidth=1.6;fontSize=15;fontColor=#222222;labelBackgroundColor=#ffffff;exitX=0.667;exitY=1.000;exitPerimeter=0;entryX=0.667;entryY=0.000;entryPerimeter=0" target="SLAM" value="/scan">
           <mxGeometry relative="1" x="0.0619" as="geometry">
@@ -199,8 +201,10 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="e13" edge="1" parent="1" source="EKF" style="endArrow=classic;endFill=1;html=1;rounded=0;strokeColor=#1c7ed6;strokeWidth=1.6;fontSize=15;fontColor=#222222;labelBackgroundColor=#ffffff;exitX=1.000;exitY=0.500;exitPerimeter=0;entryX=0.000;entryY=0.500;entryPerimeter=0" target="SLAM" value="/odometry/filtered">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="e13" edge="1" parent="1" source="EKF" style="endArrow=classic;endFill=1;html=1;rounded=0;strokeColor=#1c7ed6;strokeWidth=1.6;fontSize=12;fontColor=#222222;labelBackgroundColor=#ffffff;exitX=1.000;exitY=0.500;exitPerimeter=0;entryX=0.000;entryY=0.500;entryPerimeter=0" target="SLAM" value="/odometry/filtered&lt;br&gt;TF: odom → base_footprint">
+          <mxGeometry relative="1" x="-0.0248" y="39" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="e14" edge="1" parent="1" source="EKF" style="endArrow=classic;endFill=1;html=1;rounded=0;strokeColor=#1c7ed6;strokeWidth=1.6;fontSize=15;fontColor=#222222;labelBackgroundColor=#ffffff;exitX=0.333;exitY=1.000;exitPerimeter=0;entryX=0.400;entryY=0.000;entryPerimeter=0" target="NAV2" value="/odometry/filtered">
           <mxGeometry relative="1" x="-0.2455" as="geometry">
@@ -210,7 +214,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="e15" edge="1" parent="1" source="SLAM" style="endArrow=classic;endFill=1;html=1;rounded=0;strokeColor=#1c7ed6;strokeWidth=1.6;fontSize=15;fontColor=#222222;labelBackgroundColor=#ffffff;exitX=0.333;exitY=1.000;exitPerimeter=0;entryX=0.600;entryY=0.000;entryPerimeter=0" target="NAV2" value="/map">
+        <mxCell id="e15" edge="1" parent="1" source="SLAM" style="endArrow=classic;endFill=1;html=1;rounded=0;strokeColor=#1c7ed6;strokeWidth=1.6;fontSize=15;fontColor=#222222;labelBackgroundColor=#ffffff;exitX=0.333;exitY=1.000;exitPerimeter=0;entryX=0.600;entryY=0.000;entryPerimeter=0" target="NAV2" value="/map · TF: map → odom">
           <mxGeometry relative="1" x="0.0096" as="geometry">
             <Array as="points">
               <mxPoint x="1663.3" y="753" />
@@ -232,7 +236,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="e18" edge="1" parent="1" source="CC" style="endArrow=classic;endFill=1;html=1;rounded=0;strokeColor=#4c5fd5;strokeWidth=1.6;fontSize=15;fontColor=#222222;labelBackgroundColor=#ffffff;exitX=0.500;exitY=0.000;exitPerimeter=0;entryX=0.500;entryY=1.000;entryPerimeter=0" target="GZ" value="/castor_cmd_pos  [sim]">
+        <mxCell id="e18" edge="1" parent="1" source="CC" style="endArrow=classic;endFill=1;html=1;rounded=0;strokeColor=#4c5fd5;strokeWidth=1.6;fontSize=15;fontColor=#222222;labelBackgroundColor=#ffffff;exitX=0.500;exitY=0.000;exitPerimeter=0;entryX=0.500;entryY=1.000;entryPerimeter=0" target="GZ" value="/cmd_vel_out · /castor_cmd_pos  [sim]">
           <mxGeometry relative="1" x="-0.7726" as="geometry">
             <Array as="points">
               <mxPoint x="675" y="681" />
@@ -378,23 +382,20 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="e38" edge="1" parent="1" source="FI" style="endArrow=classic;endFill=1;html=1;rounded=0;strokeColor=#2f9e44;strokeWidth=1.6;fontSize=15;fontColor=#222222;labelBackgroundColor=#ffffff;exitX=0.833;exitY=1.000;exitPerimeter=0;entryX=0.750;entryY=0.000;entryPerimeter=0" target="ESP1" value="/pwm_left">
-          <mxGeometry relative="1" x="-0.2265" as="geometry">
+        <mxCell id="e38" edge="1" parent="1" source="CC" style="endArrow=classic;endFill=1;html=1;rounded=0;strokeColor=#4c5fd5;strokeWidth=1.6;fontSize=15;fontColor=#222222;labelBackgroundColor=#ffffff;exitX=0.5;exitY=1;entryX=0.750;entryY=0.000;entryPerimeter=0;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;" target="ESP1" value="/target_speed_left&lt;br&gt;/target_speed_right  [hw]">
+          <mxGeometry relative="1" x="-0.7861" as="geometry">
+            <mxPoint as="offset" />
             <Array as="points">
-              <mxPoint x="2438.3" y="1107" />
-              <mxPoint x="2545" y="1107" />
-              <mxPoint x="2545" y="1593" />
-              <mxPoint x="2422.5" y="1593" />
+              <mxPoint x="675" y="1469.9" />
+              <mxPoint x="2422.5" y="1469.9" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="e39" edge="1" parent="1" source="FI" style="endArrow=classic;endFill=1;html=1;rounded=0;strokeColor=#2f9e44;strokeWidth=1.6;fontSize=15;fontColor=#222222;labelBackgroundColor=#ffffff;exitX=0.667;exitY=1.000;exitPerimeter=0;entryX=0.500;entryY=0.000;entryPerimeter=0" target="ESP1" value="/pwm_right">
-          <mxGeometry relative="1" x="0.8007" as="geometry">
+        <mxCell id="e39" edge="1" parent="1" source="FI" style="endArrow=classic;endFill=1;html=1;rounded=0;strokeColor=#2f9e44;strokeWidth=1.6;fontSize=15;fontColor=#222222;labelBackgroundColor=#ffffff;exitX=0.333;exitY=0.000;exitPerimeter=0;entryX=0.800;entryY=0.000;entryPerimeter=0" target="CC" value="/fork_insertion/cmd_vel">
+          <mxGeometry relative="1" x="0.1" as="geometry">
             <Array as="points">
-              <mxPoint x="2406.7" y="1251" />
-              <mxPoint x="2533" y="1251" />
-              <mxPoint x="2533" y="1473" />
-              <mxPoint x="2375" y="1473" />
+              <mxPoint x="2343.3" y="861" />
+              <mxPoint x="732" y="861" />
             </Array>
           </mxGeometry>
         </mxCell>
@@ -538,7 +539,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="e57" edge="1" parent="1" source="T1" style="endArrow=classic;endFill=1;html=1;rounded=0;strokeColor=#1971c2;strokeWidth=1.6;fontSize=15;fontColor=#222222;labelBackgroundColor=#ffffff;exitX=0.364;exitY=0.000;exitPerimeter=0;entryX=0.667;entryY=1.000;entryPerimeter=0" target="CC" value="/manual_cmd_vel">
+        <mxCell id="e57" edge="1" parent="1" source="T1" style="endArrow=classic;endFill=1;html=1;rounded=0;strokeColor=#1971c2;strokeWidth=1.6;fontSize=15;fontColor=#222222;labelBackgroundColor=#ffffff;exitX=0.364;exitY=0.000;exitPerimeter=0;entryX=0.667;entryY=1.000;entryPerimeter=0" target="CC" value="/manual_cmd_vel&lt;br&gt;/e_stop · /gui/mode">
           <mxGeometry relative="1" x="0.2035" as="geometry">
             <Array as="points">
               <mxPoint x="1669.1" y="1179" />

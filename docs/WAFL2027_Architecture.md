@@ -65,7 +65,7 @@ This is a **continuation and major upgrade** of WAFL 2026. The foundation (robot
 ║  │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  │    ║
 ║  │  │  SLAM / Mapping  │  │   Navigation    │  │  WMS Bridge     │  │    ║
 ║  │  │  SLAM Toolbox   │  │   Nav2 Stack    │  │  mission_node   │  │    ║
-║  │  │  robot_loc. EKF │  │   DWB / BT Nav  │  │  status_pub     │  │    ║
+║  │  │  robot_loc. EKF │  │   RPP / DWB     │  │  status_pub     │  │    ║
 ║  │  └────────┬────────┘  └────────┬────────┘  └────────┬────────┘  │    ║
 ║  │           │                    │                     │           │    ║
 ║  │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  │    ║
@@ -84,8 +84,8 @@ This is a **continuation and major upgrade** of WAFL 2026. The foundation (robot
 ║  │  DRIVING        │  │  STEERING + IMU     │  │  LIFT + LIGHTS      │   ║
 ║  │  2x DC motors   │  │  Stepper (TB6600)   │  │  Lift DC motor      │   ║
 ║  │  Encoders       │  │  MPU-6050/BNO055    │  │  2x limit switches  │   ║
-║  │  /pwm_left      │  │  /target_angle      │  │  /lift_cmd          │   ║
-║  │  /pwm_right     │  │  /imu/data  (NEW)   │  │  /lights_cmd        │   ║
+║  │  /target_speed_left      │  │  /target_angle      │  │  /lift_cmd          │   ║
+║  │  /target_speed_right     │  │  /imu/data  (NEW)   │  │  /lights_cmd        │   ║
 ║  │  /encoder_count │  │  (replaces phone)   │  │  /fork_height (NEW) │   ║
 ║  └─────────────────┘  └────────────────────┘  └─────────────────────┘   ║
 ╚══════════════════════════════════════════════════════════════════════════╝
@@ -168,8 +168,8 @@ No major changes expected. Candidate improvements:
 
 | Topic | Direction | Type | Notes |
 |-------|-----------|------|-------|
-| `/pwm_left` | Sub | `Float32` | ±255 |
-| `/pwm_right` | Sub | `Float32` | ±255 |
+| `/target_speed_left` | Sub | `Float32` | ±255 |
+| `/target_speed_right` | Sub | `Float32` | ±255 |
 | `/encoder_count` | Pub | `Float32` | raw ticks |
 
 ### 6.2 ESP32 #2 — Steering + IMU (UPGRADED)
@@ -183,7 +183,7 @@ The ESP32 now publishes `sensor_msgs/Imu` messages with real covariances. The EK
 
 | Topic | Direction | Type | Notes |
 |-------|-----------|------|-------|
-| `/target_angle` | Sub | `Float32` | degrees, from caster_controller |
+| `/target_angle` | Sub | `Float32` | degrees, from base_controller |
 | `/imu/data` | Pub | `sensor_msgs/Imu` | **NEW** — replaces `/imu_yaw` Float32 |
 
 ### 6.3 ESP32 #3 — Lift + Lights
@@ -287,7 +287,7 @@ max_vel_theta: 1.5 rad/s
 
 ### 8.2 Caster Controller (Unified — 2026 Bug Fixed)
 
-**2026 bug:** The caster controller published to `/castor_cmd_pos` (simulation) which was NOT connected to the real ESP32 (`/target_angle`). In 2027, a single `caster_controller` node handles both:
+**2026 bug:** The caster controller published to `/castor_cmd_pos` (simulation) which was NOT connected to the real ESP32 (`/target_angle`). In 2027, a single `base_controller` node handles both:
 
 ```python
 # Simulation (use_sim_time=true):  publishes to /castor_cmd_pos
@@ -563,12 +563,12 @@ mission_manager_node:
 ```
 ESP32 #1:
   /encoder_count -> encoder_velocity_node -> /wheel_velocity
-  /pwm_left  <- [motion controller, TBD]
-  /pwm_right <-
+  /target_speed_left  <- base_controller (hardware mode)
+  /target_speed_right <- base_controller (hardware mode)
 
 ESP32 #2:
   /imu/data -> EKF (robot_localization) -> /odometry/filtered
-  /target_angle <- caster_controller
+  /target_angle <- base_controller
 
 ESP32 #3:
   /lift_cmd    <- fork_insertion_node
@@ -592,8 +592,9 @@ RPLiDAR:
 /odometry/filtered -> Nav2 -> /cmd_vel
 /map               -> Nav2
 
-/cmd_vel -> caster_controller -> /target_angle      (hardware mode)
-                              -> /castor_cmd_pos    (simulation mode)
+/cmd_vel, /manual_cmd_vel, /fork_insertion/cmd_vel
+  -> base_controller -> /target_angle, /target_speed_left, /target_speed_right  (hardware mode)
+                     -> /castor_cmd_pos                       (simulation mode; drive via Gazebo DiffDrive)
 
 WMS Server -> wms_bridge_node -> /wms/mission
 /robot/status -> wms_bridge_node -> WMS Server
@@ -646,7 +647,7 @@ WAFL_2027/
 |   |   |-- config/nav2_params.yaml
 |   |   |-- launch/navigation.launch.py
 |   |   `-- wafl_navigation/
-|   |       `-- caster_controller.py (UNIFIED: sim + hardware)
+|   |       `-- base_controller.py (UNIFIED: sim + hardware)
 |   |
 |   |-- wafl_perception/             <- ArUco + YOLO + rear safety
 |   |   |-- launch/
@@ -750,7 +751,7 @@ This single command starts: Gazebo + SLAM + Nav2 + Perception + Mission Manager 
 
 | 2026 Gap | 2026 Impact | 2027 Resolution |
 |----------|------------|-----------------|
-| `/castor_cmd_pos` != `/target_angle` | Caster not wired to real hardware | FIXED: unified caster_controller with `use_sim_time` param |
+| `/castor_cmd_pos` != `/target_angle` | Caster not wired to real hardware | FIXED: unified base_controller with `use_sim_time` param |
 | Phone IMU — fragile UDP | Robot needs a phone | FIXED: proper IMU on ESP32 #2 |
 | Location DB hardcoded in two Python files | Must edit two files per change | FIXED: `locations.yaml` as ROS parameter |
 | No fork-insertion sequence | Full autonomy impossible | FIXED: `fork_insertion_node.py` state machine |
@@ -819,7 +820,7 @@ This single command starts: Gazebo + SLAM + Nav2 + Perception + Mission Manager 
 ### Phase 5 — Hardware Integration (Weeks 10–14)
 - [ ] Flash updated firmware to all 3 ESP32s
 - [ ] Replace phone IMU with hardware IMU on ESP32 #2
-- [ ] Test real robot with new unified caster_controller
+- [ ] Test real robot with new unified base_controller
 - [ ] Tune EKF with real IMU data
 - [ ] Test fork insertion on real hardware
 
@@ -845,7 +846,7 @@ This single command starts: Gazebo + SLAM + Nav2 + Perception + Mission Manager 
 | IMU | Simulated ImuSensor plugin | MPU-6050 / BNO055 on ESP32 #2 |
 | Odometry | Gazebo DiffDrive -> odom_covariance_fix | encoder_velocity_node + odom_fusion_node |
 | Caster control | `/castor_cmd_pos` (Gazebo joint) | `/target_angle` (ESP32 #2) |
-| Driving | Gazebo DiffDrive plugin | `/pwm_left`, `/pwm_right` (ESP32 #1) |
+| Driving | Gazebo DiffDrive plugin | `/target_speed_left`, `/target_speed_right` (ESP32 #1) |
 | Lift | Simulated prismatic joint | `/lift_cmd` (ESP32 #3) |
 | WMS | Local stub server | Real WMS server (networked) |
 | Charging dock | Simulated ArUco marker in world | Real physical dock with ArUco |

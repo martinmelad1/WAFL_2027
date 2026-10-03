@@ -65,7 +65,7 @@ We build in two phases. **Phase 2 cannot start until Phase 1 is solid.**
 ║  wafl_description  →  URDF in Gazebo Harmonic                ║
 ║  wafl_simulation   →  Gazebo world + ros_gz_bridge           ║
 ║  wafl_localization →  EKF + SLAM Toolbox (sim mode)          ║
-║  wafl_navigation   →  Nav2 + unified caster_controller       ║
+║  wafl_navigation   →  Nav2 + unified base_controller         ║
 ║  wafl_perception   →  ArUco + YOLO (CPU mode in sim)         ║
 ║  dashboard/        →  PySide6 GUI (all 3 tabs)               ║
 ║  wafl_mission      →  camera_stream_node + STUBS for rest    ║
@@ -105,9 +105,7 @@ We build in two phases. **Phase 2 cannot start until Phase 1 is solid.**
 ```
 WAFL_2027/
 │
-├── LAUNCH.md                        ← Start here: how to run everything
-├── WAFL2027_Architecture.md         ← Master architecture document
-├── WAFL2027_Team_README.md          ← THIS FILE
+├── README.md                        ← THIS FILE — single source of truth
 │
 ├── docker/
 │   ├── Dockerfile                   ← Ubuntu 24.04 + ROS 2 Jazzy + all deps
@@ -132,9 +130,12 @@ WAFL_2027/
 │   │   │   └── wafl.urdf.xacro
 │   │   ├── meshes/
 │   │   └── launch/
-│   │       └── view_urdf.launch.py
+│   │       ├── view_urdf.launch.py
+│   │       └── rsp.launch.py        ← robot_state_publisher (TF tree)
 │   │
 │   ├── wafl_simulation/             ← Gazebo Harmonic world + spawn + bridge
+│   │   ├── wafl_simulation/
+│   │   │   └── sim_fork_adapter.py  ← /lift_cmd <-> fork joint, /fork_height (sim only)
 │   │   ├── worlds/
 │   │   │   └── warehouse.world      ← shelves, pallets, ArUco markers, dock
 │   │   ├── models/                  ← pallet models with ArUco textures
@@ -155,9 +156,9 @@ WAFL_2027/
 │   │       ├── localization.launch.py
 │   │       └── slam_mapping.launch.py
 │   │
-│   ├── wafl_navigation/             ← Nav2 + caster controller
+│   ├── wafl_navigation/             ← Nav2 + base_controller
 │   │   ├── wafl_navigation/
-│   │   │   └── caster_controller.py     ← unified: sim + hardware via param
+│   │   │   └── base_controller.py       ← unified steer + drive: sim + hardware via param
 │   │   ├── config/
 │   │   │   └── nav2_params.yaml
 │   │   └── launch/
@@ -189,10 +190,16 @@ WAFL_2027/
 │   │   └── config/
 │   │       └── wms_config.yaml
 │   │
-│   └── wafl_energy/                 ← Battery + charging dock (Phase 2)
-│       └── wafl_energy/
-│           ├── battery_monitor_node.py  ← STUB in Phase 1
-│           └── charging_dock_node.py    ← Phase 2 only
+│   ├── wafl_energy/                 ← Battery + charging dock (Phase 2)
+│   │   └── wafl_energy/
+│   │       ├── battery_monitor_node.py  ← STUB in Phase 1
+│   │       └── charging_dock_node.py    ← Phase 2 only
+│   │
+│   └── wafl_bringup/                ← ament package (ros2 launch needs a package)
+│       └── launch/
+│           ├── simulation.launch.py ← Full sim: Gazebo + SLAM + Nav2 + Perc
+│           ├── hardware.launch.py   ← Full hardware bringup
+│           └── mapping.launch.py    ← SLAM mapping session only
 │
 ├── dashboard/                       ← PySide6 GUI (Phase 1 priority)
 │   ├── main.py                      ← entry point
@@ -225,14 +232,9 @@ WAFL_2027/
 │   └── esp32_lift_lights/
 │       └── Lifting_aux_uROS.ino
 │
-├── bringup/                         ← Master launch files
-│   ├── simulation.launch.py         ← Full sim: Gazebo + SLAM + Nav2 + Perc
-│   ├── hardware.launch.py           ← Full hardware bringup
-│   └── mapping.launch.py            ← SLAM mapping session only
-│
 └── docs/
-    └── diagrams/
-        └── WAFL2027_Architecture_Graph.md  ← Mermaid diagram (editable)
+    ├── WAFL2027_Architecture.md     ← Long-form rationale (README wins on any conflict)
+    └── diagrams/                    ← drawio source + png/svg exports
 ```
 
 ---
@@ -255,11 +257,13 @@ ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
 
 | Direction | Topic | Type | Notes |
 |-----------|-------|------|-------|
-| Sub | `/pwm_left` | `Float32` | ±255 PWM to left drive motor |
-| Sub | `/pwm_right` | `Float32` | ±255 PWM to right drive motor |
+| Sub | `/target_speed_left` | `Float32` | Target speed (m/s) for left drive; ESP32 runs the PID against encoder feedback |
+| Sub | `/target_speed_right` | `Float32` | Target speed (m/s) for right drive; ESP32 runs the PID against encoder feedback |
 | Pub | `/encoder_count` | `Float32` | Raw encoder ticks (left wheel) |
 
 Hardware: 2× DC motors + H-bridge, 1× encoder (600 PPR, gear ratio ≈ 3.14)
+**Control:** the ESP32 closes the speed loop (PID) itself and owns the tick→speed conversion; its wheel radius / gear ratio must match the `encoder_velocity_node` params.
+> ⚠️ With a single encoder (left wheel) only the left loop has feedback; the right wheel runs feed-forward (open loop) until D8 (right-wheel encoder) is resolved.
 
 #### ESP32 #2 — Steering + IMU `[FIRMWARE — UPGRADED]`
 
@@ -269,6 +273,7 @@ Hardware: 2× DC motors + H-bridge, 1× encoder (600 PPR, gear ratio ≈ 3.14)
 | Pub | `/imu/data` | `sensor_msgs/Imu` | Full 9-DOF + covariances |
 
 Hardware: Stepper motor (TB6600) + MPU-6050 or BNO055 IMU
+> ⚠️ A stepper has no position feedback: it needs a home switch (or potentiometer) at boot so `/target_angle` is absolute (D16). MPU-6050 has no magnetometer, so yaw drifts — BNO055 recommended (D19).
 **2027 change:** Replaces fragile phone-IMU UDP protocol entirely. Uses proper `sensor_msgs/Imu` with real covariance matrices.
 
 #### ESP32 #3 — Lift + Lights `[FIRMWARE]`
@@ -353,7 +358,7 @@ Only launched when `use_sim_time:=true`.
 | Direction | Topic | Type |
 |-----------|-------|------|
 | Sub | `/scan` | `sensor_msgs/LaserScan` |
-| Sub | `/odometry/filtered` | `Odometry` |
+| Sub | TF `odom → base_footprint` | — (SLAM Toolbox reads odometry through TF, not a topic) |
 | Pub | `/map` | `nav_msgs/OccupancyGrid` |
 | Pub | TF `map → odom` | — |
 
@@ -362,23 +367,55 @@ Only launched when `use_sim_time:=true`.
 
 ---
 
+#### `robot_state_publisher` `[P1 — was missing from earlier drafts]`
+
+**Purpose:** Publish the static robot TF tree from the URDF (`wafl_description`). Without it, LiDAR scans and camera frames have no transform to the robot and SLAM / Nav2 / pallet nodes all fail.
+
+| Direction | Topic | Type | Notes |
+|-----------|-------|------|-------|
+| Sub | `/joint_states` | `JointState` | Caster / fork joints (sim: from the bridge) |
+| Pub | `/tf_static`, `/tf` | `TFMessage` | `base_footprint → base_link → laser_link / camera_link / imu_link / fork_link` |
+
+**Full TF tree — exactly one publisher per edge:**
+```
+map ──(SLAM Toolbox)──► odom ──(EKF)──► base_footprint ──(robot_state_publisher)──► base_link ──► sensors
+```
+Gazebo's DiffDrive TF publishing **must be disabled**, otherwise two nodes publish `odom → base_footprint`.
+**Clock:** every node runs with `use_sim_time` and, in sim, `/clock` must be bridged from Gazebo (§6).
+
+---
+
 ### 4.3 Navigation Layer — `wafl_navigation`
 
-#### `caster_controller` `[P1 — KEY FIX FROM 2026]`
+#### `base_controller` `[P1 — KEY FIX FROM 2026]` (formerly `caster_controller`)
 
-**Purpose:** Convert `cmd_vel` → front caster steering angle. Unified node for sim and hardware.
+**Purpose:** Convert a velocity command into **left/right wheel speed setpoints** and a **front caster angle**. Single owner of ESP32 #1 (driving) and ESP32 #2 (steering), and the single **arbiter** of who may command motion. Unified node for sim and hardware.
+
+**Robot geometry:** differential rear drive (2 DC motors) + one front caster steered by a stepper.
 
 | Direction | Topic | Type | Condition |
 |-----------|-------|------|-----------|
-| Sub | `/cmd_vel` | `Twist` | Auto mode |
-| Sub | `/manual_cmd_vel` | `Twist` | Manual override from GUI |
+| Sub | `/manual_cmd_vel` | `Twist` | MANUAL mode — highest priority |
+| Sub | `/fork_insertion/cmd_vel` | `Twist` | Fine approach (APPROACH → INSERT_FORKS) |
+| Sub | `/charging_dock/cmd_vel` | `Twist` | Final dock approach |
+| Sub | `/cmd_vel` | `Twist` | AUTO mode (Nav2) — lowest priority |
+| Sub | `/gui/mode` | `String` | MANUAL / AUTO selector |
+| Sub | `/e_stop` | `Bool` | Latched stop |
+| Pub | `/cmd_vel_out` | `Twist` | Arbitrated command, both modes (sim: Gazebo DiffDrive input) |
 | Pub | `/target_angle` | `Float32` (degrees) | `use_sim_time=false` (hardware) |
+| Pub | `/target_speed_left` | `Float32` (m/s) | `use_sim_time=false` (hardware) |
+| Pub | `/target_speed_right` | `Float32` (m/s) | `use_sim_time=false` (hardware) |
 | Pub | `/castor_cmd_pos` | `Float64` (radians) | `use_sim_time=true` (simulation) |
 
-**Param:** `use_sim_time` — set at launch, no code change needed.
-**Kinematics:** `angle = atan2(-ω × L, v)`, clamped ±80°, L = 0.5 m wheelbase.
+**Arbitration (evaluated every cycle):** `/e_stop` → output zero · MANUAL → only `/manual_cmd_vel` · AUTO → `/fork_insertion/cmd_vel` or `/charging_dock/cmd_vel` if received in the last 0.2 s, otherwise `/cmd_vel`.
+**Command timeout:** if the selected source is silent for `cmd_timeout` (0.5 s) output zero. The ESP32s apply the same timeout to `/target_speed_*` / `/target_angle`.
+**Wheel speeds (differential):** `v_left = v − ω·W/2`, `v_right = v + ω·W/2`, `W` = `track_width` (m, **measure on the robot**).
+**Caster angle:** `angle = sgn(v)·atan2(−ω·L, |v|)` (sgn(0)=+1), clamped ±80°, `L` = 0.5 m axle→caster. The `|v|`/`sgn` form keeps the angle correct when reversing.
+**No PID on the Jetson** — ESP32 #1 closes the speed loop on its encoder and outputs PWM itself. `/wheel_velocity` feeds odometry only, never `base_controller`.
+**Simulation:** hardware topics are not published. Gazebo DiffDrive consumes `/cmd_vel_out` (**never** raw `/cmd_vel`, or manual / fork / dock commands would bypass arbitration) and the caster follows `/castor_cmd_pos`.
+**Params:** `track_width`, `wheelbase_L`, `max_angle_deg`, `cmd_timeout`, `use_sim_time`.
 
-> ⚠️ **2026 bug this fixes:** In 2026, the caster controller always published to `/castor_cmd_pos` only. On real hardware this had no effect. The 2027 unified node uses `use_sim_time` to select the correct output topic automatically.
+> ⚠️ **2026 bug this fixes:** In 2026, the caster controller always published to `/castor_cmd_pos` only. On real hardware this had no effect, and nothing converted `cmd_vel` to wheel speed setpoints. The 2027 unified node uses `use_sim_time` to select the correct outputs automatically.
 
 ---
 
@@ -395,8 +432,17 @@ Only launched when `use_sim_time:=true`.
 | Pub | `/plan` | `Path` |
 | Action Server | `navigate_to_pose` | `NavigateToPose` |
 
-Local planner: **DWB** (default, proven from 2026). MPPI to be benchmarked.
-Speed: `max_vel_x: 1.0 m/s`, `max_vel_theta: 1.5 rad/s`
+**Local Controller (Path Tracker):**
+- **Regulated Pure Pursuit (RPP)** (`nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController`): Recommended for warehouse aisle driving. Tracks reference paths smoothly with lookahead distance regulation, adaptive slowdown on curves, and zero lateral oscillation.
+- **DWB** (`dwb_core::DWBLocalPlanner`): Default baseline carried over from 2026. MPPI to be benchmarked for dynamic obstacle avoidance (see D6).
+- Speed limits: `max_vel_x: 1.0 m/s`, `max_vel_theta: 1.5 rad/s`.
+
+**Architecture Note (Pure Pursuit vs `base_controller`):**
+Pure Pursuit operates strictly **before** (upstream of) `base_controller`:
+1. **Pure Pursuit (inside Nav2):** Tracks the global `/plan` and outputs body velocity commands $(v, \omega)$ on `/cmd_vel` (`geometry_msgs/Twist`). It has no knowledge of wheel dimensions, motor ticks, or caster mechanics.
+2. **`base_controller` (downstream):** Arbitrates incoming commands and converts body $(v, \omega)$ into physical actuator setpoints: left/right wheel speeds ($v_L, v_R$) for ESP32 #1 and caster angle ($\delta$) for ESP32 #2.
+
+**Pose source:** TF (`map → odom → base_footprint`); `/odometry/filtered` supplies velocity only. Nav2 treats the robot as differential-drive; the caster is `base_controller`'s job.
 
 ---
 
@@ -494,25 +540,33 @@ Speed: `max_vel_x: 1.0 m/s`, `max_vel_theta: 1.5 rad/s`
 |-----------|------------------|------|
 | Sub | `/wms/mission` | `WmsMission` |
 | Sub | `/battery/low_alert` | `Bool` |
+| Sub | `/battery/state` | `BatteryState` (fills `RobotStatus.battery_percentage`) |
+| Sub | `/fork_height` | `Float32` (fills `RobotStatus.fork_height_mm`) |
+| Sub | `/fork_insertion/state` | `String` |
 | Sub | `/fork_insertion/done` | `Bool` |
+| Sub | `/pallet_location_id` | `String` |
+| Sub | `/charging_dock/state` | `String` |
 | Sub | `/gui/mode` | `String` |
 | Sub | `/e_stop` | `Bool` |
+| Sub | TF `map → base_footprint` | (fills `RobotStatus.robot_pose`) |
 | Pub | `/robot/state` | `String` |
 | Pub | `/robot/status` | `RobotStatus` |
 | Pub | `/lights_cmd` | `Int32MultiArray` |
 | Pub | `/mission_manager/fork_goal` | `WmsMission` |
+| Pub | `/charging_dock/start` | `Bool` |
 | Action Client | `navigate_to_pose` | `NavigateToPose` |
 | Action Client | `insert_forks` | `InsertForks.action` |
+
+**E-stop:** `/e_stop` = true → cancel the active Nav2 goal and `insert_forks` goal, switch to MANUAL, state = `ESTOPPED`. Cleared only by GUI [RESUME AUTO]. `base_controller` and `fork_insertion_node` also subscribe to `/e_stop` directly, so motion stops even if this node is busy or dead.
 
 **Manual override flow:**
 ```
 GUI → /gui/mode = "MANUAL"
-  mission_manager deactivates Nav2 lifecycle nodes
-  caster_controller switches to /manual_cmd_vel input
+  mission_manager cancels the active Nav2 goal (see D20)
+  base_controller switches to /manual_cmd_vel input
 
 GUI → /gui/mode = "AUTO"
-  mission_manager re-activates Nav2 lifecycle nodes
-  resumes saved mission state
+  mission_manager resumes saved mission state
 ```
 
 ---
@@ -535,8 +589,7 @@ IDLE → APPROACH → ROTATE_ALIGN → LATERAL_CENTER → INSERT_FORKS → LIFT 
 | Sub | `/pallet/final_z_m` | `Float32` | INSERT_FORKS |
 | Sub | `/fork_height` | `Float32` | LIFT, CONFIRM |
 | Sub | `/mission_manager/fork_goal` | `WmsMission` | Start trigger |
-| Pub | `/pwm_left` | `Float32` | INSERT_FORKS fine drive |
-| Pub | `/pwm_right` | `Float32` | INSERT_FORKS fine drive |
+| Pub | `/fork_insertion/cmd_vel` | `Twist` | APPROACH → INSERT_FORKS fine drive (consumed by `base_controller`) |
 | Pub | `/lift_cmd` | `Int32` | LIFT / DROP |
 | Pub | `/fork_insertion/state` | `String` | All states → GUI + mission_manager |
 | Pub | `/fork_insertion/done` | `Bool` | Signals completion |
@@ -562,9 +615,12 @@ Phase 2: reads real BMS via I2C.
 
 | Direction | Topic | Type |
 |-----------|-------|------|
+| Sub | `/charging_dock/start` | `Bool` — from `mission_manager` (CHARGE state) |
 | Sub | `/pallet_location_id` | `String` — watch for "99" |
 | Sub | `/pallet_pose` | `PoseStamped` |
-| Pub | `/charging_dock/state` | `String` |
+| Sub | `/battery/state` | `BatteryState` — confirm charging |
+| Pub | `/charging_dock/state` | `String` — IDLE \| NAVIGATING \| ALIGNING \| DOCKED \| FAILED |
+| Pub | `/charging_dock/cmd_vel` | `Twist` — final approach, via `base_controller` |
 | Pub | `/lift_cmd` | `Int32` — forks down before docking |
 | Action Client | `navigate_to_pose` | `NavigateToPose` |
 
@@ -601,7 +657,7 @@ Phase 2: reads real BMS via I2C.
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-**Subscribes:** `/map`, `/odometry/filtered`, `/plan`, `/robot/state`, `/cmd_vel`, `/fork_height`, `/battery/state`, `/wms/mission_status`
+**Subscribes:** `/map`, TF `map → base_footprint` (robot icon), `/odometry/filtered` (actual speed), `/plan`, `/robot/state`, `/fork_height`, `/battery/state`, `/wms/mission_status`, `/pallet/debug_image`
 **Publishes:** `/e_stop`, `/manual_cmd_vel`, `/lift_cmd`, `/lights_cmd`, `/gui/mode`, `/wms/manual_mission`
 **Receives:** TCP JPEG stream (front camera only)
 
@@ -630,7 +686,7 @@ Phase 2: reads real BMS via I2C.
 **ESP32 liveness:** inferred from topic publication rate (silence = dead).
 **Event log:** subscribes to `/rosout` — all nodes' `self.get_logger()` calls appear here automatically.
 
-**Subscribes:** `/rosout`, `/wms/connection_status`, `/encoder_count` (ESP32 #1 heartbeat), `/imu/data` (ESP32 #2 heartbeat), `/fork_height` (ESP32 #3 heartbeat)
+**Subscribes:** `/rosout`, `/wms/connection_status`, `/fork_insertion/state`, `/charging_dock/state`, `/encoder_count` (ESP32 #1 heartbeat), `/imu/data` (ESP32 #2 heartbeat), `/fork_height` (ESP32 #3 heartbeat)
 
 ---
 
@@ -675,9 +731,11 @@ Phase 2: reads real BMS via I2C.
 | LiDAR | `GpuLidarSensor` | `/scan` |
 | Front RGB | `CameraSensor` | `/camera/image_raw` |
 | Front Depth | `DepthCameraSensor` | `/camera/depth/image_raw` |
-| IMU | `ImuSensor` | `/imu/data` |
-| Wheel odometry | `DiffDrivePlugin` | `/odom` |
+| IMU | `ImuSensor` | `/imu` (raw → `odom_covariance_fix` → `/imu_fixed`) |
+| Wheel odometry | `DiffDrivePlugin` (TF publishing **disabled** — the EKF owns `odom → base_footprint`) | `/odom` (output), `/cmd_vel_out` (input — **not** `/cmd_vel`) |
 | Caster joint | Prismatic + `ros_gz_bridge` | `/castor_cmd_pos` (input) |
+| Fork joint | Prismatic + JointController | `/fork_cmd_vel` (input), `/joint_states` (output) — wrapped by `sim_fork_adapter` |
+| Simulation clock | Gazebo | `/clock` (**required** for `use_sim_time:=true`) |
 
 ### Warehouse World Contents
 - Warehouse floor with shelves and aisles
@@ -706,18 +764,61 @@ Phase 2: reads real BMS via I2C.
   gz_type_name:   "gz.msgs.Image"
   direction: GZ_TO_ROS
 
-- ros_topic_name: "/imu/data"
+- ros_topic_name: "/imu"                      # raw sim IMU; hardware publishes /imu/data instead
   gz_topic_name:  "/imu"
   ros_type_name:  "sensor_msgs/msg/Imu"
   gz_type_name:   "gz.msgs.IMU"
   direction: GZ_TO_ROS
+
+- ros_topic_name: "/clock"                    # without this, every use_sim_time node stalls
+  gz_topic_name:  "/clock"
+  ros_type_name:  "rosgraph_msgs/msg/Clock"
+  gz_type_name:   "gz.msgs.Clock"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/odom"
+  gz_topic_name:  "/model/wafl/odometry"
+  ros_type_name:  "nav_msgs/msg/Odometry"
+  gz_type_name:   "gz.msgs.Odometry"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/cmd_vel_out"              # arbitrated output of base_controller
+  gz_topic_name:  "/model/wafl/cmd_vel"
+  ros_type_name:  "geometry_msgs/msg/Twist"
+  gz_type_name:   "gz.msgs.Twist"
+  direction: ROS_TO_GZ
 
 - ros_topic_name: "/castor_cmd_pos"
   gz_topic_name:  "/model/wafl/joint/caster_joint/cmd_pos"
   ros_type_name:  "std_msgs/msg/Float64"
   gz_type_name:   "gz.msgs.Double"
   direction: ROS_TO_GZ
+
+- ros_topic_name: "/fork_cmd_vel"
+  gz_topic_name:  "/model/wafl/joint/fork_joint/cmd_vel"
+  ros_type_name:  "std_msgs/msg/Float64"
+  gz_type_name:   "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/joint_states"
+  gz_topic_name:  "/world/warehouse/model/wafl/joint_state"
+  ros_type_name:  "sensor_msgs/msg/JointState"
+  gz_type_name:   "gz.msgs.Model"
+  direction: GZ_TO_ROS
 ```
+
+### `sim_fork_adapter` `[P1 — SIMULATION ONLY]`
+
+**Purpose:** Hardware has ESP32 #3 (`/lift_cmd` in, `/fork_height` out). Gazebo has a prismatic joint. This node makes the sim look like the ESP32 so `fork_insertion_node` is identical in both modes.
+
+| Direction | Topic | Type | Notes |
+|-----------|-------|------|-------|
+| Sub | `/lift_cmd` | `Int32` | 0=STOP, 1=UP, 2=DOWN → joint velocity |
+| Sub | `/joint_states` | `JointState` | Read fork joint position |
+| Pub | `/fork_cmd_vel` | `Float64` | → Gazebo fork joint |
+| Pub | `/fork_height` | `Float32` (mm) | Same contract as ESP32 #3 |
+
+Top/bottom limit switches are emulated by the joint limits.
 
 ### The One Rule for Sim vs Hardware
 
@@ -725,44 +826,52 @@ Every launch file accepts `use_sim_time` parameter — no code changes needed to
 
 ```bash
 # Simulation
-ros2 launch bringup simulation.launch.py use_sim_time:=true
+ros2 launch wafl_bringup simulation.launch.py use_sim_time:=true
 
 # Hardware
-ros2 launch bringup hardware.launch.py use_sim_time:=false
+ros2 launch wafl_bringup hardware.launch.py use_sim_time:=false
 ```
 
 ---
 
 ## 7. Master Topic Index
 
+> **QoS:** `/e_stop`, `/gui/mode`, `/robot/state` use `transient_local` (latched) so a late-joining node (GUI reconnect, restarted `base_controller`) immediately learns the current value. Sensor streams use `sensor_data` (best-effort).
+
 | Topic | Type | Publisher | Subscriber(s) |
 |-------|------|-----------|---------------|
 | `/encoder_count` | `Float32` | ESP32 #1 | `encoder_velocity_node`, GUI Tab2 (heartbeat) |
 | `/wheel_velocity` | `Float32` | `encoder_velocity_node` | `odom_fusion_node` |
-| `/imu/data` | `sensor_msgs/Imu` | ESP32 #2 / Gazebo | `odom_fusion_node`, EKF, GUI Tab2 (heartbeat) |
+| `/imu/data` | `sensor_msgs/Imu` | ESP32 #2 (hardware only; sim uses `/imu`) | `odom_fusion_node`, EKF, GUI Tab2 (heartbeat) |
 | `/imu` (sim raw) | `Imu` | `ros_gz_bridge` | `odom_covariance_fix` |
 | `/imu_fixed` | `Imu` | `odom_covariance_fix` | EKF (sim only) |
 | `/odom` | `Odometry` | `odom_fusion_node` / Gazebo | `odom_covariance_fix`, EKF |
 | `/odom_fixed` | `Odometry` | `odom_covariance_fix` | EKF (sim only) |
-| `/odometry/filtered` | `Odometry` | EKF | Nav2, SLAM Toolbox, GUI Tab1 |
+| `/odometry/filtered` | `Odometry` | EKF | Nav2 (velocity only), GUI Tab1 (actual speed) |
 | `/scan` | `LaserScan` | RPLiDAR / Gazebo | SLAM Toolbox, Nav2 |
 | `/map` | `OccupancyGrid` | SLAM Toolbox | Nav2, GUI Tab1 |
-| `/cmd_vel` | `Twist` | Nav2 | `caster_controller`, GUI Tab1 (speed readout) |
-| `/manual_cmd_vel` | `Twist` | GUI Tab1 | `caster_controller` (manual mode) |
-| `/target_angle` | `Float32` | `caster_controller` | ESP32 #2 |
-| `/castor_cmd_pos` | `Float64` | `caster_controller` | Gazebo (sim only) |
+| `/cmd_vel` | `Twist` | Nav2 | `base_controller` |
+| `/manual_cmd_vel` | `Twist` | GUI Tab1 | `base_controller` (manual mode) |
+| `/fork_insertion/cmd_vel` | `Twist` | `fork_insertion_node` | `base_controller` |
+| `/charging_dock/cmd_vel` | `Twist` | `charging_dock_node` | `base_controller` |
+| `/cmd_vel_out` | `Twist` | `base_controller` | Gazebo DiffDrive (sim only) |
+| `/target_angle` | `Float32` | `base_controller` | ESP32 #2 |
+| `/castor_cmd_pos` | `Float64` | `base_controller` | Gazebo (sim only) |
 | `/plan` | `Path` | Nav2 | GUI Tab1 |
-| `/pwm_left` | `Float32` | `fork_insertion_node` | ESP32 #1 |
-| `/pwm_right` | `Float32` | `fork_insertion_node` | ESP32 #1 |
-| `/lift_cmd` | `Int32` | `fork_insertion_node`, GUI Tab1 | ESP32 #3 |
+| `/target_speed_left` | `Float32` | `base_controller` | ESP32 #1 |
+| `/target_speed_right` | `Float32` | `base_controller` | ESP32 #1 |
+| `/lift_cmd` | `Int32` | `fork_insertion_node`, `charging_dock_node`, GUI Tab1 | ESP32 #3 / `sim_fork_adapter` |
 | `/lights_cmd` | `Int32MultiArray` | `mission_manager_node`, GUI Tab1 | ESP32 #3 |
-| `/fork_height` | `Float32` | ESP32 #3 | `fork_insertion_node`, GUI Tab1, GUI Tab2 (heartbeat) |
+| `/fork_height` | `Float32` | ESP32 #3 / `sim_fork_adapter` | `fork_insertion_node`, `mission_manager_node`, GUI Tab1, GUI Tab2 (heartbeat) |
+| `/fork_cmd_vel` | `Float64` | `sim_fork_adapter` | Gazebo fork joint (sim only) |
+| `/joint_states` | `JointState` | Gazebo (sim) | `robot_state_publisher`, `sim_fork_adapter` |
 | `/camera/image_raw` | `Image` | Kinect / Gazebo | `pallet_pose_node`, `pallet_front_angle_node`, `camera_stream_node` |
 | `/camera/depth/image_raw` | `Image` | Kinect / Gazebo | `pallet_front_angle_node` |
-| `/pallet_pose` | `PoseStamped` | `pallet_pose_node` | `fork_insertion_node` |
+| `/pallet_pose` | `PoseStamped` | `pallet_pose_node` | `fork_insertion_node`, `charging_dock_node` |
 | `/pallet_location` | `String` | `pallet_pose_node` | (informational logging) |
-| `/pallet_location_id` | `String` | `pallet_pose_node` | `mission_manager_node` |
+| `/pallet_location_id` | `String` | `pallet_pose_node` | `mission_manager_node`, `charging_dock_node` |
 | `/fork_target` | `PointStamped` | `pallet_pose_node` | `fork_insertion_node` |
+| `/pallet_marker` | `visualization_msgs/Marker` | `pallet_pose_node` | RViz |
 | `/pallet/rotate_to_front_rad` | `Float32` | `pallet_front_angle_node` | `fork_insertion_node` |
 | `/pallet/center_yaw_rad` | `Float32` | `pallet_front_angle_node` | `fork_insertion_node` |
 | `/pallet/final_z_m` | `Float32` | `pallet_front_angle_node` | `fork_insertion_node` |
@@ -779,12 +888,16 @@ ros2 launch bringup hardware.launch.py use_sim_time:=false
 | `/mission_manager/fork_goal` | `WmsMission` | `mission_manager_node` | `fork_insertion_node` |
 | `/fork_insertion/state` | `String` | `fork_insertion_node` | GUI Tab2, `mission_manager_node` |
 | `/fork_insertion/done` | `Bool` | `fork_insertion_node` | `mission_manager_node` |
-| `/battery/state` | `BatteryState` | `battery_monitor_node` | GUI Tab1, `wms_bridge_node` |
+| `/battery/state` | `BatteryState` | `battery_monitor_node` | GUI Tab1, `wms_bridge_node`, `mission_manager_node`, `charging_dock_node` |
 | `/battery/low_alert` | `Bool` | `battery_monitor_node` | `mission_manager_node` |
-| `/charging_dock/state` | `String` | `charging_dock_node` | GUI Tab2 |
-| `/e_stop` | `Bool` | GUI Tab1 | `mission_manager_node` |
-| `/gui/mode` | `String` | GUI Tab1 | `mission_manager_node` |
+| `/charging_dock/start` | `Bool` | `mission_manager_node` | `charging_dock_node` |
+| `/charging_dock/state` | `String` | `charging_dock_node` | `mission_manager_node`, GUI Tab2 |
+| `/e_stop` | `Bool` | GUI Tab1 | `mission_manager_node`, `base_controller`, `fork_insertion_node` |
+| `/gui/mode` | `String` | GUI Tab1 | `mission_manager_node`, `base_controller` |
 | `/rosout` | `rcl_interfaces/Log` | All nodes | GUI Tab2 |
+| `/clock` | `rosgraph_msgs/Clock` | Gazebo via `ros_gz_bridge` (sim only) | All nodes (`use_sim_time:=true`) |
+| `/tf` | `tf2_msgs/TFMessage` | EKF (`odom→base_footprint`), SLAM Toolbox (`map→odom`) | Nav2, SLAM Toolbox, `mission_manager_node` (pose), GUI Tab1 (robot icon) |
+| `/tf_static` | `tf2_msgs/TFMessage` | `robot_state_publisher` | Nav2, `pallet_*` nodes, GUI |
 
 ---
 
@@ -862,12 +975,21 @@ float32 progress_percent
 | D3 | WMS protocol | ✅ DECIDED | MQTT (Mosquitto) | Broker hard to deploy → FastAPI WebSocket |
 | D4 | GUI technology | ✅ DECIDED | PySide6 + QtWebEngine | Moving to browser → React + web_video_server |
 | D5 | WMS Phase 1 server | ✅ DECIDED | FastAPI stub | — |
-| D6 | Nav2 local planner | ⬜ OPEN | DWB (default) | Jerky trajectory → benchmark MPPI |
+| D6 | Nav2 local planner | ⬜ OPEN | Regulated Pure Pursuit (RPP) vs DWB | RPP tracks straight warehouse aisles and curves smoothly without DWB jitter; benchmark MPPI if dynamic obstacle dodging needed |
 | D7 | Charging dock detection | ✅ DECIDED | ArUco ID=99 (reuses pipeline) | Bad lighting → IR beacon |
 | D8 | Dual encoders | ⬜ OPEN | Single encoder + IMU yaw | Poor turns → add right-wheel encoder |
 | D9 | Fork height sensing | ⬜ OPEN | Potentiometer | — |
 | D10 | Load cell | ⬜ OPEN | Skipped | Needed for CONFIRM state reliability |
 | D11 | Camera streaming | ✅ DECIDED | MJPEG over TCP | Browser GUI → WebRTC |
+| D12 | Fork handoff mechanism | ⬜ OPEN | Three overlapping paths exist today: `/mission_manager/fork_goal` topic, `insert_forks` action, `/fork_insertion/done` topic | **Recommend action only** (goal/result/feedback/cancel); delete the topic pair |
+| D13 | Who owns `DROP` | ⬜ OPEN | Listed in both `mission_manager` and `fork_insertion_node` state machines | Recommend `InsertForks.action` goal gets an `operation` field (PICKUP \| DROP); `mission_manager` owns NAVIGATE_TO_DROP only |
+| D14 | Unused interfaces | ⬜ OPEN | `Alarm.msg` and `SetMission.srv` have no publisher / server | Wire `/alarms` + a service, or delete them |
+| D15 | Safety chain | ⬜ OPEN | Software: `/e_stop` reaches `base_controller` + `fork_insertion_node`, 0.5 s command timeout. **Hardware e-stop that cuts motor power is required** — the GUI button goes over Wi-Fi | Not optional for a forklift |
+| D16 | Caster homing / limits | ⬜ OPEN | Stepper (TB6600) has no position feedback → add home switch or potentiometer. ±80° clamp vs 90° needed for in-place rotation | Constrain Nav2 rotation behaviour or raise clamp |
+| D17 | GUI robot pose source | ✅ DECIDED | TF `map → base_footprint` (`/odometry/filtered` is odom-frame and drifts against the map) | — |
+| D18 | Averaged pallet topics | ⬜ OPEN | Perception section mentions `_avg` / `_weighted_avg` variants that are not in the topic index | Decide which one `fork_insertion_node` consumes; list it or drop the claim |
+| D19 | IMU part | ⬜ OPEN | MPU-6050 is 6-DOF (no magnetometer → yaw drifts); BNO055 gives fused orientation | Prefer BNO055 |
+| D20 | Manual mode vs Nav2 lifecycle | ⬜ OPEN | Currently "deactivate Nav2 lifecycle nodes" (slow, costmaps restart) | Recommend: cancel the goal and let `base_controller` arbitrate |
 
 ### Research Links
 
@@ -895,9 +1017,10 @@ float32 progress_percent
 | IMU | `ImuSensor` plugin | MPU-6050 / BNO055 on ESP32 #2 |
 | Odometry | Gazebo DiffDrive → `odom_covariance_fix` → EKF | `encoder_velocity_node` + `odom_fusion_node` → EKF |
 | Caster | `/castor_cmd_pos` (Gazebo joint) | `/target_angle` → ESP32 #2 |
-| Driving | Gazebo DiffDrive plugin | `/pwm_left`, `/pwm_right` → ESP32 #1 |
-| Lift | Gazebo prismatic joint | `/lift_cmd` → ESP32 #3 |
-| Fork height | Simulated joint state | Potentiometer → ESP32 #3 → `/fork_height` |
+| Driving | Gazebo DiffDrive plugin ← `/cmd_vel_out` | `/target_speed_left`, `/target_speed_right` → ESP32 #1 (PID on the ESP32) |
+| Lift | Gazebo prismatic joint via `sim_fork_adapter` | `/lift_cmd` → ESP32 #3 |
+| Fork height | `sim_fork_adapter` from joint state | Potentiometer → ESP32 #3 → `/fork_height` |
+| Clock | `/clock` from Gazebo bridge | System clock |
 | WMS | FastAPI stub (localhost) | Real WMS server (networked) |
 | Charging dock | ArUco ID=99 in world model | Real dock with ArUco marker |
 | `use_sim_time` | `true` | `false` |
@@ -925,7 +1048,7 @@ cd wms_server && uvicorn main:app --port 8080
 ### Native — Simulation
 ```bash
 # Terminal 1
-ros2 launch bringup simulation.launch.py use_sim_time:=true
+ros2 launch wafl_bringup simulation.launch.py use_sim_time:=true
 
 # Terminal 2
 cd dashboard && python3 main.py
@@ -940,7 +1063,7 @@ cd wms_server && uvicorn main:app --port 8080
 ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
 
 # Jetson: Terminal 2
-ros2 launch bringup hardware.launch.py use_sim_time:=false
+ros2 launch wafl_bringup hardware.launch.py use_sim_time:=false
 
 # Operator laptop: GUI
 cd dashboard && python3 main.py
