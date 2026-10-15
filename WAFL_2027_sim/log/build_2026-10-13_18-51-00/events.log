@@ -1,0 +1,119 @@
+[0.000000] (-) TimerEvent: {}
+[0.000696] (wafl_simulation) JobQueued: {'identifier': 'wafl_simulation', 'dependencies': OrderedDict()}
+[0.000763] (wafl_simulation) JobStarted: {'identifier': 'wafl_simulation'}
+[0.098880] (-) TimerEvent: {}
+[0.199292] (-) TimerEvent: {}
+[0.299767] (-) TimerEvent: {}
+[0.400165] (-) TimerEvent: {}
+[0.500844] (-) TimerEvent: {}
+[0.601225] (-) TimerEvent: {}
+[0.701673] (-) TimerEvent: {}
+[0.802007] (-) TimerEvent: {}
+[0.902373] (-) TimerEvent: {}
+[1.002835] (-) TimerEvent: {}
+[1.103240] (-) TimerEvent: {}
+[1.203593] (-) TimerEvent: {}
+[1.303978] (-) TimerEvent: {}
+[1.404404] (-) TimerEvent: {}
+[1.504875] (-) TimerEvent: {}
+[1.605429] (-) TimerEvent: {}
+[1.705880] (-) TimerEvent: {}
+[1.806327] (-) TimerEvent: {}
+[1.906777] (-) TimerEvent: {}
+[2.007344] (-) TimerEvent: {}
+[2.107804] (-) TimerEvent: {}
+[2.208238] (-) TimerEvent: {}
+[2.308743] (-) TimerEvent: {}
+[2.409159] (-) TimerEvent: {}
+[2.509633] (-) TimerEvent: {}
+[2.610114] (-) TimerEvent: {}
+[2.710557] (-) TimerEvent: {}
+[2.811256] (-) TimerEvent: {}
+[2.815616] (wafl_simulation) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'develop', '--editable', '--build-directory', '/home/mireille-youssef/WAFL_2027/build/wafl_simulation/build', '--no-deps', 'symlink_data'], 'cwd': '/home/mireille-youssef/WAFL_2027/build/wafl_simulation', 'env': {'LESSOPEN': '| /usr/bin/lesspipe %s', 'QML_IMPORT_PATH': '/opt/ros/jazzy/lib/qml6', 'GZ_SIM_RESOURCE_PATH': '/opt/ros/jazzy/share:/home/mireille-youssef/WAFL_2027/src/wafl_simulation/models', 'USER': 'mireille-youssef', 'GZ_CONFIG_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/share/gz:/opt/ros/jazzy/opt/gz_gui_vendor/share/gz:/opt/ros/jazzy/opt/gz_transport_vendor/share/gz:/opt/ros/jazzy/opt/gz_rendering_vendor/share/gz:/opt/ros/jazzy/opt/gz_plugin_vendor/share/gz:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/share/gz:/opt/ros/jazzy/opt/gz_msgs_vendor/share/gz:/opt/ros/jazzy/opt/gz_common_vendor/share/gz:/opt/ros/jazzy/opt/sdformat_vendor/share/gz', 'XDG_SESSION_TYPE': 'wayland', 'CLUTTER_DISABLE_MIPMAPPED_TEXT': '1', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/lib:/opt/ros/jazzy/opt/gz_sensors_vendor/lib:/opt/ros/jazzy/opt/gz_physics_vendor/lib:/opt/ros/jazzy/opt/gz_gui_vendor/lib:/opt/ros/jazzy/opt/gz_transport_vendor/lib:/opt/ros/jazzy/opt/gz_rendering_vendor/lib:/opt/ros/jazzy/opt/gz_plugin_vendor/lib:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/lib:/opt/ros/jazzy/opt/gz_msgs_vendor/lib:/opt/ros/jazzy/opt/gz_common_vendor/lib:/opt/ros/jazzy/opt/gz_ogre_next_vendor/lib:/opt/ros/jazzy/opt/gz_dartsim_vendor/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/x86_64-linux-gnu:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'HOME': '/home/mireille-youssef', 'OLDPWD': '/home/mireille-youssef/WAFL_2027/src', 'DESKTOP_SESSION': 'ubuntu', 'ROS_PYTHON_VERSION': '3', 'GNOME_SHELL_SESSION_MODE': 'ubuntu', 'GTK_MODULES': 'gail:atk-bridge', 'SYSTEMD_EXEC_PID': '2153', 'GSM_SKIP_SSH_AGENT_WORKAROUND': 'true', 'QML2_IMPORT_PATH': '/opt/ros/jazzy/share/rqml_default_plugins:/opt/ros/jazzy/share/rqml_core', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLORTERM': 'truecolor', 'DEBUGINFOD_URLS': 'https://debuginfod.ubuntu.com', 'IM_CONFIG_PHASE': '1', 'WAYLAND_DISPLAY': 'wayland-0', 'COLCON_PREFIX_PATH': '/home/mireille-youssef/install', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'mireille-youssef', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'MEMORY_PRESSURE_WATCH': '/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/session.slice/org.gnome.Shell@wayland.service/memory.pressure', 'XDG_SESSION_CLASS': 'user', 'USERNAME': 'mireille-youssef', 'TERM': 'xterm-256color', 'GNOME_DESKTOP_SESSION_ID': 'this-is-deprecated', 'PATH': '/opt/ros/jazzy/opt/gz_msgs_vendor/bin:/opt/ros/jazzy/opt/gz_ogre_next_vendor/bin:/opt/ros/jazzy/opt/gz_tools_vendor/bin:/opt/ros/jazzy/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin', 'SESSION_MANAGER': 'local/mireille-youssef-HP-Laptop-17-cn1xxx:@/tmp/.ICE-unix/2118,unix/mireille-youssef-HP-Laptop-17-cn1xxx:/tmp/.ICE-unix/2118', 'XDG_MENU_PREFIX': 'gnome-', 'GNOME_TERMINAL_SCREEN': '/org/gnome/Terminal/screen/79506a21_c04a_4870_bbb7_e30556cebbf4', 'GNOME_SETUP_DISPLAY': ':1', 'XDG_RUNTIME_DIR': '/run/user/1000', 'DISPLAY': ':0', 'LANG': 'en_US.UTF-8', 'XDG_CURRENT_DESKTOP': 'ubuntu:GNOME', 'XMODIFIERS': '@im=ibus', 'XDG_SESSION_DESKTOP': 'ubuntu', 'XAUTHORITY': '/run/user/1000/.mutter-Xwaylandauth.NVNSW3', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'GNOME_TERMINAL_SERVICE': ':1.115', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'AMENT_PREFIX_PATH': '/opt/ros/jazzy', 'SHELL': '/bin/bash', 'QT_ACCESSIBILITY': '1', 'GDMSESSION': 'ubuntu', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'QT_IM_MODULE': 'ibus', 'PWD': '/home/mireille-youssef/WAFL_2027/build/wafl_simulation', 'XDG_CONFIG_DIRS': '/etc/xdg/xdg-ubuntu:/etc/xdg', 'XDG_DATA_DIRS': '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop', 'PYTHONPATH': '/home/mireille-youssef/WAFL_2027/build/wafl_simulation/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib/python3.12/site-packages:/opt/ros/jazzy/opt/gz_sim_vendor/lib/python:/opt/ros/jazzy/opt/gz_transport_vendor/lib/python:/opt/ros/jazzy/opt/gz_msgs_vendor/lib/python:/opt/ros/jazzy/opt/sdformat_vendor/lib/python:/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'MEMORY_PRESSURE_WRITE': 'c29tZSAyMDAwMDAgMjAwMDAwMAA=', 'VTE_VERSION': '7600', 'CMAKE_PREFIX_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor'}, 'shell': False}
+[2.911402] (-) TimerEvent: {}
+[3.011861] (-) TimerEvent: {}
+[3.112428] (-) TimerEvent: {}
+[3.212842] (-) TimerEvent: {}
+[3.313248] (-) TimerEvent: {}
+[3.413627] (-) TimerEvent: {}
+[3.514016] (-) TimerEvent: {}
+[3.614427] (-) TimerEvent: {}
+[3.664179] (wafl_simulation) StdoutLine: {'line': b'running develop\n'}
+[3.714564] (-) TimerEvent: {}
+[3.815037] (-) TimerEvent: {}
+[3.915463] (-) TimerEvent: {}
+[4.015863] (-) TimerEvent: {}
+[4.116342] (-) TimerEvent: {}
+[4.158401] (wafl_simulation) StdoutLine: {'line': b'running egg_info\n'}
+[4.158807] (wafl_simulation) StdoutLine: {'line': b'creating wafl_simulation.egg-info\n'}
+[4.195988] (wafl_simulation) StdoutLine: {'line': b'writing wafl_simulation.egg-info/PKG-INFO\n'}
+[4.196470] (wafl_simulation) StdoutLine: {'line': b'writing dependency_links to wafl_simulation.egg-info/dependency_links.txt\n'}
+[4.197120] (wafl_simulation) StdoutLine: {'line': b'writing requirements to wafl_simulation.egg-info/requires.txt\n'}
+[4.197444] (wafl_simulation) StdoutLine: {'line': b'writing top-level names to wafl_simulation.egg-info/top_level.txt\n'}
+[4.197795] (wafl_simulation) StdoutLine: {'line': b"writing manifest file 'wafl_simulation.egg-info/SOURCES.txt'\n"}
+[4.216445] (-) TimerEvent: {}
+[4.276737] (wafl_simulation) StdoutLine: {'line': b"reading manifest file 'wafl_simulation.egg-info/SOURCES.txt'\n"}
+[4.278352] (wafl_simulation) StdoutLine: {'line': b"writing manifest file 'wafl_simulation.egg-info/SOURCES.txt'\n"}
+[4.316578] (-) TimerEvent: {}
+[4.319557] (wafl_simulation) StdoutLine: {'line': b'running build_ext\n'}
+[4.320065] (wafl_simulation) StdoutLine: {'line': b'Creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib/python3.12/site-packages/wafl-simulation.egg-link (link to .)\n'}
+[4.321174] (wafl_simulation) StdoutLine: {'line': b'\n'}
+[4.321678] (wafl_simulation) StdoutLine: {'line': b'Installed /home/mireille-youssef/WAFL_2027/build/wafl_simulation\n'}
+[4.322062] (wafl_simulation) StdoutLine: {'line': b'running symlink_data\n'}
+[4.322426] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/ament_index\n'}
+[4.322735] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/ament_index/resource_index\n'}
+[4.323046] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/ament_index/resource_index/packages\n'}
+[4.323446] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/resource/wafl_simulation -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/ament_index/resource_index/packages\n'}
+[4.323744] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/package.xml -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation\n'}
+[4.324244] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/launch\n'}
+[4.324623] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/launch/gazebo.launch.py -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/launch\n'}
+[4.325001] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/config\n'}
+[4.325339] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/config/ros_gz_bridge.yaml -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/config\n'}
+[4.325675] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/urdf\n'}
+[4.325971] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/urdf/wafl_gz_plugins.xacro -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/urdf\n'}
+[4.326357] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/urdf/wafl_sim_bootstrap.urdf.xacro -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/urdf\n'}
+[4.326717] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/worlds\n'}
+[4.327051] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/worlds/warehouse.world -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/worlds\n'}
+[4.327451] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models\n'}
+[4.327845] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_1\n'}
+[4.328197] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_1/model.config -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_1\n'}
+[4.328514] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_1/model.sdf -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_1\n'}
+[4.328832] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_1/meshes\n'}
+[4.329188] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_1/meshes/aruco_1.obj -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_1/meshes\n'}
+[4.329554] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_1/meshes/aruco_1.png -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_1/meshes\n'}
+[4.329894] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_1/meshes/aruco_1.mtl -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_1/meshes\n'}
+[4.330271] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_3\n'}
+[4.330619] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_3/model.config -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_3\n'}
+[4.331110] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_3/model.sdf -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_3\n'}
+[4.331448] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_3/meshes\n'}
+[4.331806] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_3/meshes/aruco_3.obj -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_3/meshes\n'}
+[4.332144] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_3/meshes/aruco_3.mtl -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_3/meshes\n'}
+[4.332621] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_3/meshes/aruco_3.png -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_3/meshes\n'}
+[4.332998] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_0\n'}
+[4.333261] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_0/model.config -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_0\n'}
+[4.333496] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_0/model.sdf -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_0\n'}
+[4.333725] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_0/meshes\n'}
+[4.333959] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_0/meshes/aruco_0.png -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_0/meshes\n'}
+[4.334175] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_0/meshes/aruco_0.mtl -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_0/meshes\n'}
+[4.334406] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_0/meshes/aruco_0.obj -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_0/meshes\n'}
+[4.334641] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_charging_dock\n'}
+[4.334846] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_charging_dock/model.config -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_charging_dock\n'}
+[4.335106] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_charging_dock/model.sdf -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_charging_dock\n'}
+[4.335328] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_charging_dock/meshes\n'}
+[4.335536] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_charging_dock/meshes/aruco_99.png -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_charging_dock/meshes\n'}
+[4.335735] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_charging_dock/meshes/aruco_99.obj -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_charging_dock/meshes\n'}
+[4.335945] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_charging_dock/meshes/aruco_99.mtl -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_charging_dock/meshes\n'}
+[4.336095] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_2\n'}
+[4.336236] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_2/model.config -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_2\n'}
+[4.336368] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_2/model.sdf -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_2\n'}
+[4.336488] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_2/meshes\n'}
+[4.336607] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_2/meshes/aruco_2.png -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_2/meshes\n'}
+[4.336725] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_2/meshes/aruco_2.mtl -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_2/meshes\n'}
+[4.336843] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_2/meshes/aruco_2.obj -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_2/meshes\n'}
+[4.336996] (wafl_simulation) StdoutLine: {'line': b'creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_rack_3bay\n'}
+[4.337121] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_rack_3bay/model.config -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_rack_3bay\n'}
+[4.337241] (wafl_simulation) StdoutLine: {'line': b'symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_rack_3bay/model.sdf -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_rack_3bay\n'}
+[4.393264] (wafl_simulation) CommandEnded: {'returncode': 0}
+[4.416709] (-) TimerEvent: {}
+[4.420045] (wafl_simulation) JobEnded: {'identifier': 'wafl_simulation', 'rc': 0}
+[4.421507] (-) EventReactorShutdown: {}

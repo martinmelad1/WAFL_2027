@@ -1,0 +1,16 @@
+[1.154s] Invoking command in '/home/mireille-youssef/WAFL_2027/build/wafl_simulation': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/mireille-youssef/WAFL_2027/build/wafl_simulation/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/mireille-youssef/WAFL_2027/build/wafl_simulation/build --no-deps symlink_data
+[1.467s] running develop
+[1.670s] running egg_info
+[1.689s] writing wafl_simulation.egg-info/PKG-INFO
+[1.689s] writing dependency_links to wafl_simulation.egg-info/dependency_links.txt
+[1.689s] writing requirements to wafl_simulation.egg-info/requires.txt
+[1.689s] writing top-level names to wafl_simulation.egg-info/top_level.txt
+[1.727s] reading manifest file 'wafl_simulation.egg-info/SOURCES.txt'
+[1.728s] writing manifest file 'wafl_simulation.egg-info/SOURCES.txt'
+[1.751s] running build_ext
+[1.751s] Creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib/python3.12/site-packages/wafl-simulation.egg-link (link to .)
+[1.751s] 
+[1.752s] Installed /home/mireille-youssef/WAFL_2027/build/wafl_simulation
+[1.752s] running symlink_data
+[1.752s] error: can't copy '/home/mireille-youssef/WAFL_2027/build/wafl_simulation/urdf/wafl_sim_bootstrap.urdf.xacro': doesn't exist or not a regular file
+[1.794s] Invoked command in '/home/mireille-youssef/WAFL_2027/build/wafl_simulation' returned '1': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/mireille-youssef/WAFL_2027/build/wafl_simulation/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/mireille-youssef/WAFL_2027/build/wafl_simulation/build --no-deps symlink_data

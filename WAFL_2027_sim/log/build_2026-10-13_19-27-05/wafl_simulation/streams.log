@@ -1,0 +1,15 @@
+[2.313s] Invoking command in '/home/mireille-youssef/WAFL_2027/build/wafl_simulation': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/mireille-youssef/WAFL_2027/build/wafl_simulation/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/mireille-youssef/WAFL_2027/build/wafl_simulation/build --no-deps symlink_data
+[2.982s] running develop
+[3.390s] running egg_info
+[3.429s] writing wafl_simulation.egg-info/PKG-INFO
+[3.430s] writing dependency_links to wafl_simulation.egg-info/dependency_links.txt
+[3.430s] writing requirements to wafl_simulation.egg-info/requires.txt
+[3.430s] writing top-level names to wafl_simulation.egg-info/top_level.txt
+[3.510s] reading manifest file 'wafl_simulation.egg-info/SOURCES.txt'
+[3.512s] writing manifest file 'wafl_simulation.egg-info/SOURCES.txt'
+[3.554s] running build_ext
+[3.554s] Creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib/python3.12/site-packages/wafl-simulation.egg-link (link to .)
+[3.555s] 
+[3.556s] Installed /home/mireille-youssef/WAFL_2027/build/wafl_simulation
+[3.556s] running symlink_data
+[3.618s] Invoked command in '/home/mireille-youssef/WAFL_2027/build/wafl_simulation' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/mireille-youssef/WAFL_2027/build/wafl_simulation/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/mireille-youssef/WAFL_2027/build/wafl_simulation/build --no-deps symlink_data

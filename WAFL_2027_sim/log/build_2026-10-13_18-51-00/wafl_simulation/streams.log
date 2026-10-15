@@ -1,0 +1,70 @@
+[2.820s] Invoking command in '/home/mireille-youssef/WAFL_2027/build/wafl_simulation': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/mireille-youssef/WAFL_2027/build/wafl_simulation/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/mireille-youssef/WAFL_2027/build/wafl_simulation/build --no-deps symlink_data
+[3.664s] running develop
+[4.158s] running egg_info
+[4.158s] creating wafl_simulation.egg-info
+[4.196s] writing wafl_simulation.egg-info/PKG-INFO
+[4.196s] writing dependency_links to wafl_simulation.egg-info/dependency_links.txt
+[4.197s] writing requirements to wafl_simulation.egg-info/requires.txt
+[4.197s] writing top-level names to wafl_simulation.egg-info/top_level.txt
+[4.197s] writing manifest file 'wafl_simulation.egg-info/SOURCES.txt'
+[4.276s] reading manifest file 'wafl_simulation.egg-info/SOURCES.txt'
+[4.278s] writing manifest file 'wafl_simulation.egg-info/SOURCES.txt'
+[4.319s] running build_ext
+[4.320s] Creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib/python3.12/site-packages/wafl-simulation.egg-link (link to .)
+[4.321s] 
+[4.321s] Installed /home/mireille-youssef/WAFL_2027/build/wafl_simulation
+[4.322s] running symlink_data
+[4.322s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/ament_index
+[4.322s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/ament_index/resource_index
+[4.323s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/ament_index/resource_index/packages
+[4.323s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/resource/wafl_simulation -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/ament_index/resource_index/packages
+[4.323s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/package.xml -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation
+[4.324s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/launch
+[4.324s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/launch/gazebo.launch.py -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/launch
+[4.324s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/config
+[4.325s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/config/ros_gz_bridge.yaml -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/config
+[4.325s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/urdf
+[4.326s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/urdf/wafl_gz_plugins.xacro -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/urdf
+[4.326s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/urdf/wafl_sim_bootstrap.urdf.xacro -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/urdf
+[4.326s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/worlds
+[4.327s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/worlds/warehouse.world -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/worlds
+[4.327s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models
+[4.327s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_1
+[4.328s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_1/model.config -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_1
+[4.328s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_1/model.sdf -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_1
+[4.328s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_1/meshes
+[4.329s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_1/meshes/aruco_1.obj -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_1/meshes
+[4.329s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_1/meshes/aruco_1.png -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_1/meshes
+[4.329s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_1/meshes/aruco_1.mtl -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_1/meshes
+[4.330s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_3
+[4.330s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_3/model.config -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_3
+[4.331s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_3/model.sdf -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_3
+[4.331s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_3/meshes
+[4.331s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_3/meshes/aruco_3.obj -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_3/meshes
+[4.332s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_3/meshes/aruco_3.mtl -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_3/meshes
+[4.332s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_3/meshes/aruco_3.png -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_3/meshes
+[4.332s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_0
+[4.333s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_0/model.config -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_0
+[4.333s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_0/model.sdf -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_0
+[4.333s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_0/meshes
+[4.333s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_0/meshes/aruco_0.png -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_0/meshes
+[4.334s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_0/meshes/aruco_0.mtl -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_0/meshes
+[4.334s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_0/meshes/aruco_0.obj -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_0/meshes
+[4.334s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_charging_dock
+[4.334s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_charging_dock/model.config -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_charging_dock
+[4.335s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_charging_dock/model.sdf -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_charging_dock
+[4.335s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_charging_dock/meshes
+[4.335s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_charging_dock/meshes/aruco_99.png -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_charging_dock/meshes
+[4.335s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_charging_dock/meshes/aruco_99.obj -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_charging_dock/meshes
+[4.335s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_charging_dock/meshes/aruco_99.mtl -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_charging_dock/meshes
+[4.335s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_2
+[4.336s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_2/model.config -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_2
+[4.336s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_2/model.sdf -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_2
+[4.336s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_2/meshes
+[4.336s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_2/meshes/aruco_2.png -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_2/meshes
+[4.336s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_2/meshes/aruco_2.mtl -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_2/meshes
+[4.336s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_pallet_2/meshes/aruco_2.obj -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_pallet_2/meshes
+[4.336s] creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_rack_3bay
+[4.336s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_rack_3bay/model.config -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_rack_3bay
+[4.337s] symbolically linking /home/mireille-youssef/WAFL_2027/build/wafl_simulation/models/wafl_rack_3bay/model.sdf -> /home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/models/wafl_rack_3bay
+[4.393s] Invoked command in '/home/mireille-youssef/WAFL_2027/build/wafl_simulation' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/mireille-youssef/WAFL_2027/build/wafl_simulation/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/mireille-youssef/WAFL_2027/build/wafl_simulation/build --no-deps symlink_data

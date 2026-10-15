@@ -1,0 +1,6 @@
+source;share/wafl_simulation/hook/pythonpath.dsv
+source;share/wafl_simulation/hook/pythonpath.sh
+source;share/wafl_simulation/hook/ament_prefix_path.dsv
+source;share/wafl_simulation/hook/ament_prefix_path.sh
+source;../../build/wafl_simulation/share/wafl_simulation/hook/pythonpath_develop.dsv
+source;../../build/wafl_simulation/share/wafl_simulation/hook/pythonpath_develop.sh

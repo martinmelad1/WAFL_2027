@@ -1,0 +1,54 @@
+-- The C compiler identification is GNU 13.3.0
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found ament_cmake: 2.5.6 (/opt/ros/jazzy/share/ament_cmake/cmake)
+-- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+-- Override CMake install command with custom implementation using symlinks instead of copying resources
+-- Found ament_lint_auto: 0.17.5 (/opt/ros/jazzy/share/ament_lint_auto/cmake)
+-- Added test 'flake8' to check Python code syntax and style conventions
+-- Configured 'flake8' exclude dirs and/or files: 
+-- Added test 'lint_cmake' to check CMake code style
+-- Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257
+-- Added test 'xmllint' to check XML markup files
+-- Configuring done (0.9s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/mireille-youssef/WAFL_2027/build/wafl_description
+-- Install configuration: ""
+-- Execute custom install script
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//launch/rsp.launch.py
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//launch/view_urdf.launch.py
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//urdf/WAFL2025.csv
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//urdf/WAFL2025.xacro
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//rviz/wafl_config.rviz
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//meshes/base_link.STL
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//meshes/castor.STL
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//meshes/castor_wheel.STL
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//meshes/kinect.dae
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//meshes/left_web.STL
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//meshes/left_wheel.STL
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//meshes/right_web.STL
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//meshes/right_wheel.STL
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/ament_index/resource_index/package_run_dependencies/wafl_description
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/ament_index/resource_index/parent_prefix_path/wafl_description
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/environment/ament_prefix_path.sh
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/environment/ament_prefix_path.dsv
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/environment/path.sh
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/environment/path.dsv
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/local_setup.bash
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/local_setup.sh
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/local_setup.zsh
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/local_setup.dsv
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/package.dsv
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/ament_index/resource_index/packages/wafl_description
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/cmake/wafl_descriptionConfig.cmake
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/cmake/wafl_descriptionConfig-version.cmake
+-- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/package.xml

@@ -1,0 +1,4 @@
+source;share/wafl_description/local_setup.bash
+source;share/wafl_description/local_setup.dsv
+source;share/wafl_description/local_setup.sh
+source;share/wafl_description/local_setup.zsh

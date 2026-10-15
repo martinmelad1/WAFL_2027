@@ -1,0 +1,147 @@
+[0.211s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build', '--symlink-install', '--packages-select', 'wafl_simulation']
+[0.211s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=False, symlink_install=True, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=8, event_handlers=None, ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['.'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=['wafl_simulation'], packages_skip=None, packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, cmake_args=None, cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, verb_parser=<colcon_defaults.argument_parser.defaults.DefaultArgumentsDecorator object at 0x759e494b0f50>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x759e494b0e90>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x759e494b0e90>>)
+[0.292s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.292s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.292s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.292s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.293s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[0.293s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.293s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/home/mireille-youssef/WAFL_2027'
+[0.293s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[0.293s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[0.293s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[0.293s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[0.294s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[0.294s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[0.294s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[0.294s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[0.294s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[0.347s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['cmake', 'python']
+[0.347s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'cmake'
+[0.347s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python'
+[0.347s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['python_setup_py']
+[0.347s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python_setup_py'
+[0.348s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extensions ['ignore', 'ignore_ament_install']
+[0.348s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extension 'ignore'
+[0.348s] Level 1:colcon.colcon_core.package_identification:_identify(build) ignored
+[0.348s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extensions ['ignore', 'ignore_ament_install']
+[0.348s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extension 'ignore'
+[0.348s] Level 1:colcon.colcon_core.package_identification:_identify(install) ignored
+[0.348s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extensions ['ignore', 'ignore_ament_install']
+[0.349s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extension 'ignore'
+[0.349s] Level 1:colcon.colcon_core.package_identification:_identify(log) ignored
+[0.349s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ignore', 'ignore_ament_install']
+[0.349s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore'
+[0.349s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore_ament_install'
+[0.349s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_pkg']
+[0.349s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_pkg'
+[0.349s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_meta']
+[0.349s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_meta'
+[0.349s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ros']
+[0.349s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ros'
+[0.350s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['cmake', 'python']
+[0.350s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'cmake'
+[0.350s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python'
+[0.350s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['python_setup_py']
+[0.350s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python_setup_py'
+[0.350s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception) by extensions ['ignore', 'ignore_ament_install']
+[0.350s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception) by extension 'ignore'
+[0.350s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception) by extension 'ignore_ament_install'
+[0.350s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception) by extensions ['colcon_pkg']
+[0.350s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception) by extension 'colcon_pkg'
+[0.350s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception) by extensions ['colcon_meta']
+[0.351s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception) by extension 'colcon_meta'
+[0.351s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception) by extensions ['ros']
+[0.351s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception) by extension 'ros'
+[0.351s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception) by extensions ['cmake', 'python']
+[0.351s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception) by extension 'cmake'
+[0.351s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception) by extension 'python'
+[0.351s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception) by extensions ['python_setup_py']
+[0.351s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception) by extension 'python_setup_py'
+[0.351s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception/config) by extensions ['ignore', 'ignore_ament_install']
+[0.351s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception/config) by extension 'ignore'
+[0.351s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception/config) by extension 'ignore_ament_install'
+[0.352s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception/config) by extensions ['colcon_pkg']
+[0.352s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception/config) by extension 'colcon_pkg'
+[0.352s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception/config) by extensions ['colcon_meta']
+[0.352s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception/config) by extension 'colcon_meta'
+[0.352s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception/config) by extensions ['ros']
+[0.352s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception/config) by extension 'ros'
+[0.352s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception/config) by extensions ['cmake', 'python']
+[0.352s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception/config) by extension 'cmake'
+[0.352s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception/config) by extension 'python'
+[0.352s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception/config) by extensions ['python_setup_py']
+[0.352s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_perception/config) by extension 'python_setup_py'
+[0.353s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_simulation) by extensions ['ignore', 'ignore_ament_install']
+[0.353s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_simulation) by extension 'ignore'
+[0.353s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_simulation) by extension 'ignore_ament_install'
+[0.353s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_simulation) by extensions ['colcon_pkg']
+[0.353s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_simulation) by extension 'colcon_pkg'
+[0.353s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_simulation) by extensions ['colcon_meta']
+[0.353s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_simulation) by extension 'colcon_meta'
+[0.353s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_simulation) by extensions ['ros']
+[0.353s] Level 1:colcon.colcon_core.package_identification:_identify(src/wafl_simulation) by extension 'ros'
+[0.359s] DEBUG:colcon.colcon_core.package_identification:Package 'src/wafl_simulation' with type 'ros.ament_python' and name 'wafl_simulation'
+[0.359s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[0.360s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[0.360s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[0.360s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[0.360s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[0.397s] Level 5:colcon.colcon_core.verb:set package 'wafl_simulation' build argument 'cmake_args' from command line to 'None'
+[0.397s] Level 5:colcon.colcon_core.verb:set package 'wafl_simulation' build argument 'cmake_target' from command line to 'None'
+[0.397s] Level 5:colcon.colcon_core.verb:set package 'wafl_simulation' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.397s] Level 5:colcon.colcon_core.verb:set package 'wafl_simulation' build argument 'cmake_clean_cache' from command line to 'False'
+[0.397s] Level 5:colcon.colcon_core.verb:set package 'wafl_simulation' build argument 'cmake_clean_first' from command line to 'False'
+[0.397s] Level 5:colcon.colcon_core.verb:set package 'wafl_simulation' build argument 'cmake_force_configure' from command line to 'False'
+[0.397s] Level 5:colcon.colcon_core.verb:set package 'wafl_simulation' build argument 'ament_cmake_args' from command line to 'None'
+[0.397s] Level 5:colcon.colcon_core.verb:set package 'wafl_simulation' build argument 'catkin_cmake_args' from command line to 'None'
+[0.397s] Level 5:colcon.colcon_core.verb:set package 'wafl_simulation' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.397s] DEBUG:colcon.colcon_core.verb:Building package 'wafl_simulation' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/mireille-youssef/WAFL_2027/build/wafl_simulation', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/mireille-youssef/WAFL_2027/install/wafl_simulation', 'merge_install': False, 'path': '/home/mireille-youssef/WAFL_2027/src/wafl_simulation', 'symlink_install': True, 'test_result_base': None}
+[0.397s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[0.399s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[0.399s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/mireille-youssef/WAFL_2027/src/wafl_simulation' with build type 'ament_python'
+[0.399s] Level 1:colcon.colcon_core.shell:create_environment_hook('wafl_simulation', 'ament_prefix_path')
+[0.403s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[0.404s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/hook/ament_prefix_path.dsv'
+[0.431s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/hook/ament_prefix_path.sh'
+[0.432s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.886s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/mireille-youssef/WAFL_2027/src/wafl_simulation'
+[0.887s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[2.308s] DEBUG:colcon.colcon_core.task.python.build:Available setuptools commands: install_scripts, register, update_catalog, egg_info, develop, check, dist_info, easy_install, bdist_rpm, bdist, bdist_dumb, init_catalog, install_headers, build_ext, compile_catalog, build_scripts, rotate, saveopts, sdist, extract_messages, editable_wheel, clean, upload, upload_docs, install_data, install_lib, install_egg_info, build, alias, build_clib, setopt, symlink_data, build_py, test, install, bdist_egg
+[3.210s] DEBUG:colcon.colcon_core.task.python.build:Available setuptools 'develop' options: --verbose, --no-deps, --local-snapshots-ok, --script-dir, --dry-run, --find-links, --version, --allow-hosts, --help, --site-dirs, --uninstall, --install-dir, --force-installation-into-system-dir, --egg-path, --index-url, --exclude-scripts, --build-directory, --always-copy, --install-layout, --zip-ok, --always-unzip, --quiet, --editable, --no-find-links, --multi-version, --upgrade, --prefix, --record, --user, --optimize, --no-user-cfg
+[3.221s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/mireille-youssef/WAFL_2027/build/wafl_simulation': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/mireille-youssef/WAFL_2027/build/wafl_simulation/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/mireille-youssef/WAFL_2027/build/wafl_simulation/build --no-deps symlink_data
+[4.792s] Level 1:colcon.colcon_core.shell:create_environment_hook('wafl_simulation', 'pythonpath_develop')
+[4.793s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/mireille-youssef/WAFL_2027/build/wafl_simulation/share/wafl_simulation/hook/pythonpath_develop.dsv'
+[4.794s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/mireille-youssef/WAFL_2027/build/wafl_simulation' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/mireille-youssef/WAFL_2027/build/wafl_simulation/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/mireille-youssef/WAFL_2027/build/wafl_simulation/build --no-deps symlink_data
+[4.795s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/mireille-youssef/WAFL_2027/build/wafl_simulation/share/wafl_simulation/hook/pythonpath_develop.sh'
+[4.804s] Level 1:colcon.colcon_core.environment:checking '/home/mireille-youssef/WAFL_2027/install/wafl_simulation' for CMake module files
+[4.805s] Level 1:colcon.colcon_core.environment:checking '/home/mireille-youssef/WAFL_2027/install/wafl_simulation' for CMake config files
+[4.806s] Level 1:colcon.colcon_core.environment:checking '/home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib'
+[4.807s] Level 1:colcon.colcon_core.environment:checking '/home/mireille-youssef/WAFL_2027/install/wafl_simulation/bin'
+[4.807s] Level 1:colcon.colcon_core.environment:checking '/home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib/pkgconfig/wafl_simulation.pc'
+[4.807s] Level 1:colcon.colcon_core.environment:checking '/home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib/python3.12/site-packages'
+[4.808s] Level 1:colcon.colcon_core.shell:create_environment_hook('wafl_simulation', 'pythonpath')
+[4.808s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/hook/pythonpath.dsv'
+[4.809s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/hook/pythonpath.sh'
+[4.811s] Level 1:colcon.colcon_core.environment:checking '/home/mireille-youssef/WAFL_2027/install/wafl_simulation/bin'
+[4.811s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(wafl_simulation)
+[4.812s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/package.dsv'
+[4.813s] INFO:colcon.colcon_core.shell:Creating package script '/home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/package.sh'
+[4.815s] INFO:colcon.colcon_core.shell:Creating package script '/home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/package.bash'
+[4.816s] INFO:colcon.colcon_core.shell:Creating package script '/home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/wafl_simulation/package.zsh'
+[4.819s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/mireille-youssef/WAFL_2027/install/wafl_simulation/share/colcon-core/packages/wafl_simulation)
+[4.819s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[4.820s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[4.820s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '0'
+[4.820s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[4.833s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[4.834s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[4.834s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[4.861s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[4.861s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/mireille-youssef/WAFL_2027/install/local_setup.sh'
+[4.863s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/mireille-youssef/WAFL_2027/install/_local_setup_util_sh.py'
+[4.865s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/mireille-youssef/WAFL_2027/install/setup.sh'
+[4.867s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/mireille-youssef/WAFL_2027/install/local_setup.bash'
+[4.868s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/mireille-youssef/WAFL_2027/install/setup.bash'
+[4.869s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/mireille-youssef/WAFL_2027/install/local_setup.zsh'
+[4.870s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/mireille-youssef/WAFL_2027/install/setup.zsh'

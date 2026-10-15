@@ -1,0 +1,60 @@
+[0.016s] Invoking command in '/home/mireille-youssef/WAFL_2027/build/wafl_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/mireille-youssef/WAFL_2027/src/wafl_description -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/mireille-youssef/WAFL_2027/install/wafl_description
+[0.165s] -- The C compiler identification is GNU 13.3.0
+[0.261s] -- The CXX compiler identification is GNU 13.3.0
+[0.278s] -- Detecting C compiler ABI info
+[0.370s] -- Detecting C compiler ABI info - done
+[0.378s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.378s] -- Detecting C compile features
+[0.379s] -- Detecting C compile features - done
+[0.387s] -- Detecting CXX compiler ABI info
+[0.496s] -- Detecting CXX compiler ABI info - done
+[0.507s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.508s] -- Detecting CXX compile features
+[0.508s] -- Detecting CXX compile features - done
+[0.529s] -- Found ament_cmake: 2.5.6 (/opt/ros/jazzy/share/ament_cmake/cmake)
+[0.684s] -- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+[0.775s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.837s] -- Found ament_lint_auto: 0.17.5 (/opt/ros/jazzy/share/ament_lint_auto/cmake)
+[0.960s] -- Added test 'flake8' to check Python code syntax and style conventions
+[0.960s] -- Configured 'flake8' exclude dirs and/or files: 
+[0.961s] -- Added test 'lint_cmake' to check CMake code style
+[0.962s] -- Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257
+[0.964s] -- Added test 'xmllint' to check XML markup files
+[0.967s] -- Configuring done (0.9s)
+[0.970s] -- Generating done (0.0s)
+[0.972s] -- Build files have been written to: /home/mireille-youssef/WAFL_2027/build/wafl_description
+[0.977s] Invoked command in '/home/mireille-youssef/WAFL_2027/build/wafl_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/mireille-youssef/WAFL_2027/src/wafl_description -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/mireille-youssef/WAFL_2027/install/wafl_description
+[0.979s] Invoking command in '/home/mireille-youssef/WAFL_2027/build/wafl_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/mireille-youssef/WAFL_2027/build/wafl_description -- -j8 -l8
+[1.019s] Invoked command in '/home/mireille-youssef/WAFL_2027/build/wafl_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/mireille-youssef/WAFL_2027/build/wafl_description -- -j8 -l8
+[1.027s] Invoking command in '/home/mireille-youssef/WAFL_2027/build/wafl_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/mireille-youssef/WAFL_2027/build/wafl_description
+[1.034s] -- Install configuration: ""
+[1.035s] -- Execute custom install script
+[1.035s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//launch/rsp.launch.py
+[1.045s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//launch/view_urdf.launch.py
+[1.054s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//urdf/WAFL2025.csv
+[1.061s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//urdf/WAFL2025.xacro
+[1.071s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//rviz/wafl_config.rviz
+[1.081s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//meshes/base_link.STL
+[1.089s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//meshes/castor.STL
+[1.096s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//meshes/castor_wheel.STL
+[1.105s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//meshes/kinect.dae
+[1.115s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//meshes/left_web.STL
+[1.124s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//meshes/left_wheel.STL
+[1.133s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//meshes/right_web.STL
+[1.144s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description//meshes/right_wheel.STL
+[1.154s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/ament_index/resource_index/package_run_dependencies/wafl_description
+[1.163s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/ament_index/resource_index/parent_prefix_path/wafl_description
+[1.172s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/environment/ament_prefix_path.sh
+[1.185s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/environment/ament_prefix_path.dsv
+[1.191s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/environment/path.sh
+[1.199s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/environment/path.dsv
+[1.210s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/local_setup.bash
+[1.221s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/local_setup.sh
+[1.229s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/local_setup.zsh
+[1.239s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/local_setup.dsv
+[1.251s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/package.dsv
+[1.260s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/ament_index/resource_index/packages/wafl_description
+[1.268s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/cmake/wafl_descriptionConfig.cmake
+[1.280s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/cmake/wafl_descriptionConfig-version.cmake
+[1.289s] -- Symlinking: /home/mireille-youssef/WAFL_2027/install/wafl_description/share/wafl_description/package.xml
+[1.299s] Invoked command in '/home/mireille-youssef/WAFL_2027/build/wafl_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/mireille-youssef/WAFL_2027/build/wafl_description

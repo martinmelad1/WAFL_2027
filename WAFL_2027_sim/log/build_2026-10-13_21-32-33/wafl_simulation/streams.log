@@ -1,0 +1,16 @@
+[1.340s] Invoking command in '/home/mireille-youssef/WAFL_2027/build/wafl_simulation': AMENT_PREFIX_PATH=/home/mireille-youssef/WAFL_2027/install/wafl_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/mireille-youssef/WAFL_2027/install/wafl_description:${CMAKE_PREFIX_PATH} DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/mireille-youssef/WAFL_2027/build/wafl_simulation/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/mireille-youssef/WAFL_2027/build/wafl_simulation/build --no-deps symlink_data
+[1.708s] running develop
+[1.917s] running egg_info
+[1.939s] writing wafl_simulation.egg-info/PKG-INFO
+[1.940s] writing dependency_links to wafl_simulation.egg-info/dependency_links.txt
+[1.940s] writing requirements to wafl_simulation.egg-info/requires.txt
+[1.940s] writing top-level names to wafl_simulation.egg-info/top_level.txt
+[1.985s] reading manifest file 'wafl_simulation.egg-info/SOURCES.txt'
+[1.986s] writing manifest file 'wafl_simulation.egg-info/SOURCES.txt'
+[2.009s] running build_ext
+[2.010s] Creating /home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib/python3.12/site-packages/wafl-simulation.egg-link (link to .)
+[2.010s] 
+[2.010s] Installed /home/mireille-youssef/WAFL_2027/build/wafl_simulation
+[2.010s] running symlink_data
+[2.011s] error: can't copy '/home/mireille-youssef/WAFL_2027/build/wafl_simulation/urdf/wafl_sim_bootstrap.urdf.xacro': doesn't exist or not a regular file
+[2.059s] Invoked command in '/home/mireille-youssef/WAFL_2027/build/wafl_simulation' returned '1': AMENT_PREFIX_PATH=/home/mireille-youssef/WAFL_2027/install/wafl_description:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/mireille-youssef/WAFL_2027/install/wafl_description:${CMAKE_PREFIX_PATH} DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/mireille-youssef/WAFL_2027/build/wafl_simulation/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/mireille-youssef/WAFL_2027/install/wafl_simulation/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/mireille-youssef/WAFL_2027/build/wafl_simulation/build --no-deps symlink_data

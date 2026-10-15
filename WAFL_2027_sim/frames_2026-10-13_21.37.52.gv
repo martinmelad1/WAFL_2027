@@ -1,0 +1,18 @@
+digraph G {
+"kinect_link" -> "camera_link"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_link" -> "kinect_link"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_footprint" -> "base_link"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_link" -> "imu_link"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_link" -> "laser"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"laser" -> "laser_link"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_link" -> "left_web"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_link" -> "right_web"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_link" -> "castor"[label=" Broadcaster: default_authority\nAverage rate: 20.294\nBuffer length: 3.4\nMost recent transform: 63.12\nOldest transform: 59.72\n"];
+"castor" -> "castor_wheel"[label=" Broadcaster: default_authority\nAverage rate: 20.294\nBuffer length: 3.4\nMost recent transform: 63.12\nOldest transform: 59.72\n"];
+"left_web" -> "left_wheel"[label=" Broadcaster: default_authority\nAverage rate: 20.294\nBuffer length: 3.4\nMost recent transform: 63.12\nOldest transform: 59.72\n"];
+"right_web" -> "right_wheel"[label=" Broadcaster: default_authority\nAverage rate: 20.294\nBuffer length: 3.4\nMost recent transform: 63.12\nOldest transform: 59.72\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1791916672.258642"[ shape=plaintext ] ;
+}->"base_footprint";
+}
