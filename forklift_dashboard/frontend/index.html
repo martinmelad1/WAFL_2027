@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WAFL 2027 Dashboard</title>
+
+  <!-- Links the design file and the behaviour file -->
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+<div class="app">
+
+  <!-- ================= TOP BAR ================= -->
+  <header class="topbar">
+    <h1>WAFL Autonomous Forklift</h1>
+
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="robot">Robot</button>
+      <button class="tab-btn" data-tab="logs">Logs</button>
+      <button class="tab-btn" data-tab="wms">WMS</button>
+    </nav>
+
+    <div class="topbar-right">
+      <div class="system-status">
+        <span id="system-led" class="led"></span>
+        <span id="system-text">System offline</span>
+      </div>
+      <!-- E-STOP is always visible, in every tab -->
+      <button id="estop" class="estop-btn">E-STOP</button>
+    </div>
+  </header>
+
+  <!-- ================= TAB 1: ROBOT ================= -->
+  <section id="tab-robot" class="tab-panel active">
+
+    <!-- ---------- Row 1: map | camera | robot data ---------- -->
+    <div class="row row-top">
+
+      <div class="card">
+        <h2>Warehouse map</h2>
+        <div class="view-box">
+          <canvas id="map-canvas"></canvas>
+          <p class="placeholder">No map data</p>
+        </div>
+        <ul class="legend">
+          <li><span class="dot dot-robot"></span>Robot</li>
+          <li><span class="dot dot-path"></span>Path</li>
+          <li><span class="dot dot-goal"></span>Goal</li>
+          <li><span class="dot dot-obstacle"></span>Obstacles</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Camera view</h2>
+        <div class="view-box">
+          <img id="camera-feed" alt="">
+          <p class="placeholder">No camera signal</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Robot data</h2>
+        <dl class="data-list">
+          <dt>State</dt>            <dd id="status-state">--</dd>
+          <dt>Position</dt>         <dd id="status-position">--</dd>
+          <dt>Heading</dt>          <dd id="status-heading">--&deg;</dd>
+          <dt>Speed</dt>            <dd id="status-speed">-- m/s</dd>
+          <dt>Battery</dt>          <dd id="status-battery">--%</dd>
+          <dt>Fork height</dt>      <dd id="status-fork">-- cm</dd>
+          <dt>Package ID</dt>       <dd id="status-package">--</dd>
+          <dt>Quantity</dt>         <dd id="status-quantity">--</dd>
+          <dt>Payload / weight</dt> <dd id="status-weight">-- kg</dd>
+          <dt>ETA</dt>              <dd id="status-eta">--</dd>
+        </dl>
+        <div class="battery-track">
+          <div id="battery-bar" class="battery-fill"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ---------- Row 2: mission | control | safety ---------- -->
+    <div class="row row-bottom">
+
+      <div class="card">
+        <h2>Mission control</h2>
+        <p class="task-id">Task <span id="mission-id">--</span></p>
+        <p class="route">
+          <span id="mission-from">--</span>
+          <span class="arrow">&#8594;</span>
+          <span id="mission-to">--</span>
+        </p>
+        <div class="mission-status">
+          <span class="indicator"><span id="mission-progress" class="led"></span>In progress</span>
+          <span class="indicator"><span id="mission-done" class="led"></span>Completed</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Control panel</h2>
+
+        <div class="mode-row">
+          <span class="mode-label">Mode</span>
+          <div class="segmented">
+            <button id="mode-auto"   class="mode-btn active">Auto</button>
+            <button id="mode-manual" class="mode-btn">Manual</button>
+          </div>
+        </div>
+
+        <!-- Manual controls: shown in Manual mode only -->
+        <div id="control-panel">
+          <div class="dpad">
+            <button class="ctrl-btn up"    data-cmd="forward">&#8593;</button>
+            <button class="ctrl-btn left"  data-cmd="left">&#8592;</button>
+            <button class="ctrl-btn down"  data-cmd="backward">&#8595;</button>
+            <button class="ctrl-btn right" data-cmd="right">&#8594;</button>
+          </div>
+
+          <div class="side-controls">
+            <div class="ctrl-row">
+              <span>Fork</span>
+              <button class="ctrl-btn small" data-cmd="lift-up">Up</button>
+              <button class="ctrl-btn small" data-cmd="lift-down">Down</button>
+            </div>
+            <div class="ctrl-row">
+              <span>Lights</span>
+              <button class="ctrl-btn small" data-cmd="lights-on">On</button>
+              <button class="ctrl-btn small" data-cmd="lights-off">Off</button>
+            </div>
+          </div>
+        </div>
+        <p class="auto-note">The robot is driving itself. Switch to Manual to take control.</p>
+      </div>
+
+      <div class="card">
+        <h2>Safety</h2>
+        <ul class="safety-list">
+          <li><span id="safety-normal"   class="led"></span>Normal</li>
+          <li><span id="safety-obstacle" class="led"></span>Obstacle detected</li>
+          <li><span id="safety-estop"    class="led"></span>Emergency (E-STOP)</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= TAB 2: LOGS (placeholder) ================= -->
+  <section id="tab-logs" class="tab-panel">
+    <div class="card">
+      <h2>Logs</h2>
+      <p>Coming soon.</p>
+    </div>
+  </section>
+
+  <!-- ================= TAB 3: WMS (placeholder) ================= -->
+  <section id="tab-wms" class="tab-panel">
+    <div class="card">
+      <h2>WMS</h2>
+      <p>Coming soon.</p>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

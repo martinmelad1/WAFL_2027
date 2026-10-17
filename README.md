@@ -1,7 +1,7 @@
 # WAFL 2027 — Team README
 
 > **Project:** Warehouse Autonomous Fork-Lift — Ain Shams University, Mechatronics & Robotics Engineering 2026/2027
-> **Stack:** ROS 2 Jazzy · Gazebo Harmonic · Jetson Xavier AGX · micro-ROS · Python 3.12 · YOLO / TensorRT
+> **Stack:** ROS 2 Jazzy · Gazebo Harmonic · Jetson Xavier AGX · micro-ROS · Python 3.12 · YOLO / TensorRT · FastAPI + HTML/JS (web GUI)
 > **Status:** Phase 1 in progress — Simulation + GUI + Manual Control
 
 ---
@@ -24,7 +24,7 @@ Before writing a single line of code:
 2. [Build Order — Phase 1 then Phase 2](#2-build-order)
 3. [Repository Structure](#3-repository-structure)
 4. [Node Reference — Every Node Defined](#4-node-reference--every-node-defined)
-5. [GUI Dashboard](#5-gui-dashboard--dashboard)
+5. [GUI Dashboard — Web (FastAPI + HTML/JS)](#5-gui-dashboard--wafl_dashboard)
 6. [Simulation — wafl_simulation](#6-simulation--wafl_simulation)
 7. [Master Topic Index](#7-master-topic-index)
 8. [Custom Messages & Actions](#8-custom-messages--actions--wafl_interfaces)
@@ -46,7 +46,7 @@ WAFL 2027 is a **fully autonomous warehouse forklift** built on a single Jetson 
 - **Autonomously inserts forks, lifts the pallet, transports and places it**
 - **Reports mission status** back to the WMS in real time
 - Monitors its **battery** and charges autonomously when needed
-- Is operated and monitored via a **PySide6 GUI dashboard** with 3 tabs
+- Is operated and monitored from **any web browser** — a 3-tab dashboard (Robot · Logs · WMS) written in HTML/JS and served by a **FastAPI** back-end running on the robot
 
 This is a major upgrade from WAFL 2026. The primary new systems: WMS integration, fork insertion automation, SLAM (live mapping), GUI dashboard, autonomous charging.
 
@@ -67,8 +67,11 @@ We build in two phases. **Phase 2 cannot start until Phase 1 is solid.**
 ║  wafl_localization →  EKF + SLAM Toolbox (sim mode)          ║
 ║  wafl_navigation   →  Nav2 + unified base_controller         ║
 ║  wafl_perception   →  ArUco + YOLO (CPU mode in sim)         ║
-║  dashboard/        →  PySide6 GUI (all 3 tabs)               ║
 ║  wafl_mission      →  camera_stream_node + STUBS for rest    ║
+║  wafl_fork_insertion / wafl_energy  →  STUB nodes (fake data)║
+║  wafl_dashboard    →  FastAPI + HTML/JS web GUI (3 tabs)     ║
+║  wafl_bringup      →  simulation / hardware launch files     ║
+║  wms_server/       →  FastAPI WMS stub (outside src/)        ║
 ║                                                              ║
 ║  GOAL: single command launches sim, robot navigates,         ║
 ║        GUI shows map + camera + status, manual override ok   ║
@@ -92,11 +95,12 @@ We build in two phases. **Phase 2 cannot start until Phase 1 is solid.**
 - [ ] SLAM Toolbox builds a map; map visible in RViz
 - [ ] Nav2 sends robot to a goal pose autonomously
 - [ ] ArUco node detects simulated pallet markers
-- [ ] GUI Tab 1 shows live map, robot pose, camera feed
-- [ ] GUI Tab 2 shows node health + `/rosout` log stream
-- [ ] GUI Tab 3 shows stub mission list from FastAPI WMS
-- [ ] E-STOP button halts robot immediately
-- [ ] Manual joystick mode works: GUI → `/manual_cmd_vel` → robot moves
+- [ ] Dashboard opens at `http://localhost:8000`; a page reload restores the full state (§5.3)
+- [ ] GUI Tab 1 shows live map, robot pose, MJPEG camera feed
+- [ ] GUI Tab 2 shows node health + live `/rosout` log stream
+- [ ] GUI Tab 3 shows stub packages + missions from the FastAPI WMS stub (via the `wms_bridge_node` stub)
+- [ ] E-STOP button halts robot immediately; RESET E-STOP → RESUME AUTO recovers it
+- [ ] Manual joystick mode works: browser → `dashboard_server` → `/manual_cmd_vel` → robot moves; releasing the key stops it
 
 ---
 
@@ -109,7 +113,7 @@ WAFL_2027/
 │
 ├── docker/
 │   ├── Dockerfile                   ← Ubuntu 24.04 + ROS 2 Jazzy + all deps
-│   ├── docker-compose.yml           ← One command: docker compose up
+│   ├── docker-compose.yml           ← One command: docker compose -f docker/docker-compose.yml up
 │   └── entrypoint.sh
 │
 ├── src/                             ← Single colcon workspace
@@ -195,27 +199,28 @@ WAFL_2027/
 │   │       ├── battery_monitor_node.py  ← STUB in Phase 1
 │   │       └── charging_dock_node.py    ← Phase 2 only
 │   │
+│   ├── wafl_dashboard/              ← Web GUI: FastAPI back-end + HTML/JS front-end (Phase 1 priority)
+│   │   ├── wafl_dashboard/
+│   │   │   ├── server.py                ← FastAPI app (REST + WebSocket + MJPEG); `dashboard_server` entry point
+│   │   │   ├── ros_node.py              ← rclpy node, spun in a background thread
+│   │   │   └── map_render.py            ← OccupancyGrid → PNG
+│   │   ├── static/                      ← installed to share/ via setup.py data_files
+│   │   │   ├── index.html               ← single page, 3 tabs: ROBOT · LOGS · WMS
+│   │   │   ├── css/style.css
+│   │   │   └── js/
+│   │   │       ├── app.js               ← tab switching, WebSocket client + auto-reconnect
+│   │   │       ├── robot_tab.js         ← Tab 1: map canvas, camera, controls, joystick
+│   │   │       ├── logs_tab.js          ← Tab 2: node health + log stream
+│   │   │       └── wms_tab.js           ← Tab 3: package grid + missions
+│   │   ├── launch/
+│   │   │   └── dashboard.launch.py
+│   │   └── requirements.txt             ← fastapi, uvicorn[standard]
+│   │
 │   └── wafl_bringup/                ← ament package (ros2 launch needs a package)
 │       └── launch/
-│           ├── simulation.launch.py ← Full sim: Gazebo + SLAM + Nav2 + Perc
-│           ├── hardware.launch.py   ← Full hardware bringup
+│           ├── simulation.launch.py ← Full sim: Gazebo + SLAM + Nav2 + Perception + Dashboard
+│           ├── hardware.launch.py   ← Full hardware bringup (includes Dashboard)
 │           └── mapping.launch.py    ← SLAM mapping session only
-│
-├── dashboard/                       ← PySide6 GUI (Phase 1 priority)
-│   ├── main.py                      ← entry point
-│   ├── ros_bridge.py                ← rclpy spin thread → Qt signals
-│   ├── tabs/
-│   │   ├── robot_tab.py             ← Tab 1: Map + controls + camera
-│   │   ├── logs_tab.py              ← Tab 2: Node health + event log
-│   │   └── wms_tab.py              ← Tab 3: WMS package grid + missions
-│   ├── widgets/
-│   │   ├── map_widget.py            ← OccupancyGrid → QImage renderer
-│   │   ├── camera_widget.py         ← TCP JPEG stream receiver
-│   │   ├── battery_widget.py
-│   │   └── joystick_widget.py
-│   ├── requirements.txt
-│   └── assets/
-│       └── styles.qss
 │
 ├── wms_server/                      ← FastAPI WMS stub (Phase 1)
 │   ├── main.py
@@ -249,6 +254,8 @@ WAFL_2027/
 
 The three ESP32s communicate with the Jetson via a **micro-ROS agent** running on the Jetson (UDP port 8888). Start the agent **before** powering the ESP32s.
 
+**Fixed-rate publishing (heartbeat contract):** each ESP32 publishes its feedback topic at a fixed rate **even when the value has not changed** — `/encoder_count` and `/imu/data` at ~50 Hz, `/fork_height` at ≥ 10 Hz. The dashboard uses these topics as heartbeats (silent > 1 s = dead, §5 Tab 2), so publish-on-change firmware would show a stationary robot as dead.
+
 ```bash
 ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
 ```
@@ -273,8 +280,8 @@ Hardware: 2× DC motors + H-bridge, 1× encoder (600 PPR, gear ratio ≈ 3.14)
 | Pub | `/imu/data` | `sensor_msgs/Imu` | Orientation + angular velocity + acceleration, with covariances (BNO055: fused 9-DOF · MPU-6050: 6-DOF, yaw drifts) |
 
 Hardware: Stepper motor (TB6600) + MPU-6050 or BNO055 IMU
-> ⚠️ A stepper has no position feedback: it needs a home switch (or potentiometer) at boot so `/target_angle` is absolute (D16). MPU-6050 has no magnetometer, so yaw drifts — BNO055 recommended (D19).
 **2027 change:** Replaces fragile phone-IMU UDP protocol entirely. Uses proper `sensor_msgs/Imu` with real covariance matrices.
+> ⚠️ A stepper has no position feedback: it needs a home switch (or potentiometer) at boot so `/target_angle` is absolute (D16). MPU-6050 has no magnetometer, so yaw drifts — BNO055 recommended (D19).
 
 #### ESP32 #3 — Lift + Lights `[FIRMWARE]`
 
@@ -285,7 +292,7 @@ Hardware: Stepper motor (TB6600) + MPU-6050 or BNO055 IMU
 | Pub | `/fork_height` | `Float32` | Fork height in mm |
 
 Hardware: 1× lift DC motor, 2× limit switches (top/bottom), 4× relay-controlled lights, potentiometer or encoder for fork height.
-**Single-writer rule (lift / lights):** several nodes publish these topics, so ownership is by mode. GUI Tab 1 publishes `/lift_cmd` / `/lights_cmd` **only in MANUAL**; `fork_insertion_node`, `charging_dock_node` (lift) and `mission_manager_node` (lights) publish **only in AUTO**. On `/e_stop` the fork and dock nodes publish `/lift_cmd = 0` (STOP).
+**Single-writer rule (lift / lights):** several nodes publish these topics, so ownership is by mode. GUI Tab 1 publishes `/lift_cmd` / `/lights_cmd` **only in MANUAL** (enforced by `dashboard_server`, §5.3); `fork_insertion_node`, `charging_dock_node` (lift) and `mission_manager_node` (lights) publish **only in AUTO**. On `/e_stop` the fork and dock nodes publish `/lift_cmd = 0` (STOP).
 
 #### Sensor drivers `[hardware only]`
 
@@ -418,12 +425,14 @@ Gazebo's DiffDrive TF publishing **must be disabled**, otherwise two nodes publi
 | Pub | `/castor_cmd_pos` | `Float64` (radians) | `sim:=true` (simulation; the topic keeps the 2026 spelling "castor") |
 
 **Arbitration (evaluated every cycle):** `/e_stop` → output zero · MANUAL → only `/manual_cmd_vel` · AUTO → `/fork_insertion/cmd_vel` or `/charging_dock/cmd_vel` if received in the last 0.2 s, otherwise `/cmd_vel`.
+**Startup default:** until the first `/gui/mode` sample arrives, mode = MANUAL — the robot never starts moving autonomously on its own.
 **Command timeout:** if the selected source is silent for `cmd_timeout` (0.5 s) output zero. The ESP32s apply the same timeout to `/target_speed_*` / `/target_angle`.
 **Wheel speeds (differential):** `v_left = v − ω·W/2`, `v_right = v + ω·W/2`, `W` = `track_width` (m, **measure on the robot**).
-**Caster angle:** `angle = sgn(v)·atan2(−ω·L, |v|)` (sgn(0)=+1), clamped ±80°, `L` = 0.5 m axle→caster. The `|v|`/`sgn` form keeps the angle correct when reversing.
+**Caster angle:** `angle = caster_direction · sgn(v)·atan2(ω·L, |v|)` (sgn(0)=+1), clamped ±80°, `L` = 0.5 m axle→caster. The `|v|`/`sgn` form keeps the angle correct when reversing.
+**Sign convention (REP-103):** `ω > 0` = counter-clockwise (left turn) → positive angle = caster points left. The Gazebo caster joint (axis +z) uses this convention, so `caster_direction = +1` in sim. On hardware, verify that a positive `/target_angle` turns the caster left; if the stepper is wired the other way set `caster_direction = −1` — fix it in this param, never in firmware.
 **No PID on the Jetson** — ESP32 #1 closes the speed loop on its encoder and outputs PWM itself. `/wheel_velocity` feeds odometry only, never `base_controller`.
 **Simulation:** hardware topics are not published. Gazebo DiffDrive consumes `/cmd_vel_out` (**never** raw `/cmd_vel`, or manual / fork / dock commands would bypass arbitration) and the caster follows `/castor_cmd_pos`.
-**Params:** `track_width`, `wheelbase_L`, `max_angle_deg`, `cmd_timeout`, `sim` (selects sim vs hardware outputs; independent of the `use_sim_time` clock flag).
+**Params:** `track_width`, `wheelbase_L`, `max_angle_deg`, `caster_direction` (+1 / −1), `cmd_timeout`, `sim` (selects sim vs hardware outputs; independent of the `use_sim_time` clock flag).
 
 ---
 
@@ -501,14 +510,15 @@ Gazebo's DiffDrive TF publishing **must be disabled**, otherwise two nodes publi
 
 #### `camera_stream_node` `[P1]`
 
-**Purpose:** Relay front camera frames from ROS to the GUI over TCP (~15 fps JPEG).
+**Purpose:** Produce a lightweight, rate-limited JPEG stream of the front camera for the web dashboard. Raw 640×480 RGB at 30 fps is ~27 MB/s — far too heavy to push to a browser over Wi-Fi.
 
-| Direction | Interface | Type |
-|-----------|-----------|------|
-| Sub | `/camera/image_raw` | `Image` |
-| Pub | TCP socket (configurable port) | JPEG-compressed frames |
+| Direction | Topic | Type | Notes |
+|-----------|-------|------|-------|
+| Sub | `/camera/image_raw` | `Image` | Kinect v1 RGB |
+| Pub | `/camera/stream/compressed` | `CompressedImage` (JPEG) | Throttled + compressed, consumed by `dashboard_server` |
 
-**Implementation:** `cv2.imencode('.jpg', frame)` → raw bytes over TCP → GUI decodes with `cv2.imdecode`.
+**Params:** `fps` (15), `jpeg_quality` (70), `width` (640)
+**Implementation:** throttle to `fps` → optional resize → `cv2.imencode('.jpg', frame)` → publish. `dashboard_server` re-serves these bytes to browsers as MJPEG (`/stream/camera`, §5.2) without re-encoding.
 
 ---
 
@@ -559,12 +569,18 @@ Gazebo's DiffDrive TF publishing **must be disabled**, otherwise two nodes publi
 | Action Client | `navigate_to_pose` | `NavigateToPose` |
 | Action Client | `insert_forks` | `InsertForks.action` |
 
-**E-stop:** `/e_stop` = true → cancel the active Nav2 goal and `insert_forks` goal, switch to MANUAL, state = `ESTOPPED`. Cleared only by GUI [RESUME AUTO], which publishes `/e_stop = false` and then `/gui/mode = "AUTO"`. `base_controller`, `fork_insertion_node` and `charging_dock_node` also subscribe to `/e_stop` directly, so motion stops even if this node is busy or dead.
+**E-stop:** GUI [E-STOP] publishes `/e_stop = true` **and** `/gui/mode = "MANUAL"`. `mission_manager_node` cancels the active Nav2 and `insert_forks` goals and enters `ESTOPPED`. `base_controller`, `fork_insertion_node` and `charging_dock_node` also subscribe to `/e_stop` directly, so motion stops even if this node is busy or dead.
+
+**E-stop recovery — two explicit operator steps:**
+1. GUI [RESET E-STOP] → `/e_stop = false`. Mode stays MANUAL (state `MANUAL`), so the operator can jog the robot clear first.
+2. GUI [RESUME AUTO] → `/gui/mode = "AUTO"`. The button is disabled while the e-stop is latched.
 
 **Manual override flow:**
 ```
 GUI → /gui/mode = "MANUAL"
-  mission_manager cancels the active Nav2 goal (see D20)
+  mission_manager cancels the active Nav2 / insert_forks goals, sends /charging_dock/start = false,
+    and saves the mission state (see D20)
+  fork_insertion_node / charging_dock_node stop publishing (they also subscribe to /gui/mode)
   base_controller switches to /manual_cmd_vel input
 
 GUI → /gui/mode = "AUTO"
@@ -593,6 +609,7 @@ IDLE → APPROACH → ROTATE_ALIGN → LATERAL_CENTER → INSERT_FORKS → LIFT 
 | Sub | `/pallet_pose` | `PoseStamped` | APPROACH |
 | Sub | `/fork_target` | `PointStamped` | APPROACH |
 | Sub | `/e_stop` | `Bool` | All states — stop, `/lift_cmd = 0` |
+| Sub | `/gui/mode` | `String` | All states — MANUAL → abort, stop publishing (single-writer rule) |
 | Sub | `/mission_manager/fork_goal` | `WmsMission` | Start trigger |
 | Pub | `/fork_insertion/cmd_vel` | `Twist` | APPROACH → INSERT_FORKS fine drive (consumed by `base_controller`) |
 | Pub | `/lift_cmd` | `Int32` | LIFT / DROP |
@@ -618,54 +635,104 @@ Phase 2: reads real BMS via I2C.
 
 #### `charging_dock_node` `[P2]`
 
-| Direction | Topic | Type |
-|-----------|-------|------|
-| Sub | `/charging_dock/start` | `Bool` — from `mission_manager` (CHARGE state) |
-| Sub | `/pallet_location_id` | `String` — watch for "99" |
-| Sub | `/pallet_pose` | `PoseStamped` |
-| Sub | `/battery/state` | `BatteryState` — confirm charging |
-| Pub | `/charging_dock/state` | `String` — IDLE \| NAVIGATING \| ALIGNING \| DOCKED \| FAILED |
-| Pub | `/charging_dock/cmd_vel` | `Twist` — final approach, via `base_controller` |
-| Pub | `/lift_cmd` | `Int32` — forks down before docking |
-| Sub | `/e_stop` | `Bool` — stop, `/lift_cmd = 0` |
-| Action Client | `navigate_to_pose` | `NavigateToPose` |
+| Direction | Topic | Type | Notes |
+|-----------|-------|------|-------|
+| Sub | `/charging_dock/start` | `Bool` | From `mission_manager` (CHARGE state); `false` = abort |
+| Sub | `/pallet_location_id` | `String` | Watch for "99" |
+| Sub | `/pallet_pose` | `PoseStamped` | Dock marker pose |
+| Sub | `/battery/state` | `BatteryState` | Confirm charging |
+| Sub | `/e_stop` | `Bool` | Stop, `/lift_cmd = 0` |
+| Sub | `/gui/mode` | `String` | MANUAL → abort, stop publishing (single-writer rule) |
+| Pub | `/charging_dock/state` | `String` | IDLE \| NAVIGATING \| ALIGNING \| DOCKED \| FAILED |
+| Pub | `/charging_dock/cmd_vel` | `Twist` | Final approach, via `base_controller` |
+| Pub | `/lift_cmd` | `Int32` | Forks down before docking |
+| Action Client | `navigate_to_pose` | `NavigateToPose` | Coarse approach to the dock |
 
 ---
 
-## 5. GUI Dashboard — `dashboard/`
+## 5. GUI Dashboard — `wafl_dashboard`
 
-**Technology:** PySide6 (Python) with optional `QWebEngineView` for rich panels.
-**ROS integration:** `rclpy` spins in a background QThread → emits Qt signals → UI updates safely (no GIL deadlocks).
+**Technology:** browser front-end in plain **HTML5 + CSS + vanilla JavaScript** (no framework, no build step), served by a **FastAPI** back-end, `dashboard_server`, which is also a ROS 2 node (`rclpy`).
+**Where it runs:** `dashboard_server` runs on the Jetson (hardware) or the sim machine / container. The operator only needs a browser at `http://<jetson-ip>:8000` — no ROS install on the operator laptop and no DDS traffic over Wi-Fi.
+**Golden rule:** the browser never talks to ROS directly (no rosbridge). Every topic the GUI uses is subscribed / published by `dashboard_server`; the browser only talks to FastAPI.
+
+### 5.1 Architecture
+
+```
+ Operator laptop (any browser)          Jetson / sim machine
+┌─────────────────────────────┐         ┌──────────────────────────────────────────┐
+│ index.html + js/ + css/     │         │ dashboard_server (FastAPI + rclpy)       │
+│ [ROBOT]  [LOGS]  [WMS]      │         │                                          │
+│                             │◄── WS ──┤ /ws        telemetry, health, logs       │
+│ <canvas> map + pose + plan  ├── WS ──►│            joystick (10 Hz)              │
+│ <img> MJPEG camera          │◄─ HTTP ─┤ /stream/*  MJPEG camera streams          │
+│ buttons / forms             ├─ HTTP ─►│ /api/*     REST commands + snapshots     │
+└─────────────────────────────┘  Wi-Fi  │            ▲ subscribe      │ publish    │
+                                        │            │  (rclpy thread) ▼           │
+                                        │       ROS 2 topic graph (DDS, local)     │
+                                        └──────────────────────────────────────────┘
+```
+
+### 5.2 Browser ↔ Back-end Interfaces
+
+| Channel | Endpoint | Direction | Content |
+|---------|----------|-----------|---------|
+| Static | `GET /` | server → browser | `index.html`, `css/`, `js/` |
+| WebSocket | `/ws` | server → browser | JSON `{"type": ..., "data": ...}`: `snapshot`, `status`, `pose`, `plan`, `battery`, `mission_status`, `map_updated`, `health`, `log`, `wms` |
+| WebSocket | `/ws` | browser → server | `{"type": "joy", "v": m/s, "w": rad/s}` → `/manual_cmd_vel` |
+| MJPEG | `GET /stream/camera` | server → browser | `multipart/x-mixed-replace` from `/camera/stream/compressed` |
+| MJPEG | `GET /stream/debug` | server → browser | `multipart/x-mixed-replace` from `/pallet/debug_image` (YOLO overlay) |
+| REST | `GET /api/map.png`, `GET /api/map/meta` | server → browser | Latest `/map` as PNG + resolution / origin / size |
+| REST | `GET /api/logs?limit=500` | server → browser | Log ring-buffer history |
+| REST | `GET /api/health` | server → browser | Node + ESP32 + WMS health (JSON) |
+| REST | `POST /api/estop` `{"active": bool}` | browser → ROS | `/e_stop` (`true` also sends `/gui/mode = "MANUAL"`) |
+| REST | `POST /api/mode` `{"mode": "MANUAL"\|"AUTO"}` | browser → ROS | `/gui/mode` (AUTO rejected while e-stop is latched) |
+| REST | `POST /api/lift` `{"cmd": 0\|1\|2}` | browser → ROS | `/lift_cmd` — MANUAL only |
+| REST | `POST /api/lights` `{"relays": [0,1,0,0]}` | browser → ROS | `/lights_cmd` — MANUAL only |
+| REST | `POST /api/mission` `{"pickup", "dropoff", "priority"}` | browser → ROS | `/wms/manual_mission` |
+
+**Server-side throttling:** `pose` / speed 10 Hz · `status` / `battery` 2 Hz · map ≤ 1 Hz (server renders the `OccupancyGrid` to PNG, pushes `map_updated`, browser re-fetches `/api/map.png?v=<stamp>`) · logs batched every 200 ms.
+
+### 5.3 Implementation Rules
+
+- **Threading:** the `rclpy` executor spins in a background thread started in FastAPI's `lifespan`; ROS callbacks hand data to asyncio with `loop.call_soon_threadsafe(...)`. Never spin ROS on the event-loop thread.
+- **One worker only:** run uvicorn with a single worker — every extra worker would create a duplicate ROS node with duplicate publishers.
+- **Joystick deadman:** the browser sends `joy` at 10 Hz while a key / button is held and `v = w = 0` on release. `dashboard_server` publishes zero if the last `joy` is older than 0.3 s or the WebSocket closes; `base_controller`'s 0.5 s `cmd_timeout` is the second layer.
+- **Single-writer rule enforced server-side:** `joy`, `/api/lift` and `/api/lights` are rejected (HTTP 409) unless mode is MANUAL.
+- **Reload-safe:** on every WebSocket (re)connect the server first sends a `snapshot` (mode, e-stop, last status, mission lists, last 500 log lines), so a page reload or Wi-Fi drop loses nothing. The browser auto-reconnects and shows a `WS: LIVE / LOST` badge.
+- **Not a safety device:** the browser E-STOP travels over Wi-Fi — a hardware e-stop that cuts motor power is still required (D15).
 
 ### Tab 1 — Robot Control & Status
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│  [ROBOT]  [LOGS]  [WMS]                                          │
+│  WAFL 2027   [ROBOT]  [LOGS]  [WMS]     WS: ● LIVE   MODE: AUTO  │
 ├──────────────────┬──────────────────┬────────────────────────────┤
 │  WAREHOUSE MAP   │  ROBOT STATUS    │  MISSION                   │
-│                  │                  │                            │
-│  Live /map       │  State: NAVIGATE │  Active: M-001  A1→B2     │
-│  Robot icon      │  Speed: 0.35 m/s │  ─────────────────────    │
-│  /plan overlay   │  Fork: 0 cm      │  Queue:                   │
-│                  │  Battery: 87%    │   M-002: C3→A1            │
+│  <canvas>        │                  │                            │
+│  Live /map       │  State: NAVIGATE │  Active: M-001  A1→B2      │
+│  Robot icon      │  Speed: 0.35 m/s │  ─────────────────────     │
+│  /plan overlay   │  Fork: 0 mm      │  Queue:                    │
+│                  │  Battery: 87%    │   M-002: C3→A1             │
 │                  │  [████████  ]    │                            │
-│                  │                  │  [Inject Mission]         │
+│                  │                  │  [Inject Mission]          │
 │                  │  [E-STOP]        │                            │
+│                  │  [RESET E-STOP]  │                            │
 │                  │  [RESUME AUTO]   │                            │
-│                  │  [Manual Mode]   │                            │
+│                  │  [MANUAL MODE]   │                            │
 ├──────────────────┴──────────────────┴────────────────────────────┤
-│  FRONT CAMERA — TCP stream from camera_stream_node               │
-│  [640×480 JPEG @ ~15 fps]                                        │
+│  FRONT CAMERA — MJPEG /stream/camera       [RAW | YOLO overlay]  │
+│  640×480 @ ~15 fps — plain <img> tag, no plugin/decoder needed   │
 ├──────────────────────────────────────────────────────────────────┤
-│  MANUAL JOYSTICK — visible only in Manual Mode                   │
-│  [↑][↓][←][→]   Lift: [UP][DOWN]   Lights: [ON][OFF]            │
+│  MANUAL JOYSTICK — visible only in MANUAL mode (keys: W A S D)   │
+│  [↑][↓][←][→]   Lift: [UP][STOP][DOWN]   Lights: [ON][OFF]       │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-**Subscribes:** `/map`, TF `map → base_footprint` (robot icon), `/odometry/filtered` (actual speed), `/plan`, `/robot/state`, `/fork_height`, `/battery/state`, `/wms/mission_status`, `/pallet/debug_image`
-**Publishes:** `/e_stop`, `/manual_cmd_vel`, `/lift_cmd`, `/lights_cmd`, `/gui/mode`, `/wms/manual_mission`
-**Receives:** TCP JPEG stream (front camera only)
+**Buttons:** [E-STOP] → `/e_stop = true` + `/gui/mode = MANUAL` · [RESET E-STOP] → `/e_stop = false` · [RESUME AUTO] → `/gui/mode = AUTO` (disabled while e-stopped) · [MANUAL MODE] → `/gui/mode = MANUAL`. See §4.5 for the full recovery flow.
+**Subscribes (via `dashboard_server`):** `/map`, TF `map → base_footprint` (robot icon), `/odometry/filtered` (actual speed), `/plan`, `/robot/state`, `/fork_height`, `/battery/state`, `/wms/mission_status`, `/camera/stream/compressed`, `/pallet/debug_image`
+**Publishes (via `dashboard_server`):** `/e_stop`, `/gui/mode`, `/manual_cmd_vel`, `/lift_cmd`, `/lights_cmd`, `/wms/manual_mission`
+**Video:** MJPEG `/stream/camera` (raw) or `/stream/debug` (YOLO overlay), toggled in the browser — front camera only
 
 ---
 
@@ -675,24 +742,24 @@ Phase 2: reads real BMS via I2C.
 ┌──────────────────────────────────────────────────────────────────┐
 │  SYSTEM HEALTH              │  EVENT LOG                         │
 │  ─────────────────────────  │  ──────────────────────────────   │
-│  ✅ slam_node               │  [10:34:01] INFO  Mission started  │
-│  ✅ nav2_stack              │  [10:35:12] WARN  Battery < 20%   │
-│  ✅ micro_ros_agent         │  [10:35:45] INFO  Pallet detected  │
+│  ✅ slam_toolbox            │  [10:34:01] INFO  Mission started  │
+│  ✅ nav2 (lifecycle)        │  [10:35:12] WARN  Battery < 20%   │
+│  ✅ base_controller         │  [10:35:45] INFO  Pallet detected  │
 │  ⚠️ camera_stream_node     │  [10:36:00] ERROR Fork timeout    │
 │  ❌ battery_monitor_node   │                                    │
-│                             │  [Filter: ALL ▼]  [Clear]         │
-│  ESP32 #1 DRIVING:  ✅     │                                    │
+│                             │  [Level: ALL ▼] [Node: ALL ▼]     │
+│  ESP32 #1 DRIVING:  ✅     │  [Pause] [Clear]                   │
 │  ESP32 #2 STEERING: ✅     │                                    │
 │  ESP32 #3 LIFT:     ✅     │                                    │
 │  WMS Server: ✅ CONNECTED   │                                    │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-**Node health:** GUI queries ROS node graph every 2 seconds.
-**ESP32 liveness:** inferred from topic publication rate (silence = dead).
-**Event log:** subscribes to `/rosout` — all nodes' `self.get_logger()` calls appear here automatically.
+**Node health:** `dashboard_server` reads the ROS node graph every 2 s and pushes a `health` message; Nav2 is shown as healthy only when its lifecycle nodes (`bt_navigator`, `controller_server`, `planner_server`) are `active`.
+**ESP32 liveness:** inferred from topic publication rate (silent > 1 s = dead). This relies on the fixed-rate publishing contract in §4.1 — the ESP32s publish even when values are unchanged. The micro-ROS agent is not a ROS node — it is healthy when the three ESP32 heartbeats arrive.
+**Event log:** `dashboard_server` subscribes to `/rosout`, keeps the last 500 entries in a ring buffer, and streams new ones over `/ws` — every node's `self.get_logger()` call appears here automatically. Filtering happens in the browser.
 
-**Subscribes:** `/rosout`, `/wms/connection_status`, `/fork_insertion/state`, `/charging_dock/state`, `/encoder_count` (ESP32 #1 heartbeat), `/imu/data` (ESP32 #2 heartbeat), `/fork_height` (ESP32 #3 heartbeat)
+**Subscribes (via `dashboard_server`):** `/rosout`, `/wms/connection_status`, `/fork_insertion/state`, `/charging_dock/state`, `/encoder_count` (ESP32 #1 heartbeat), `/imu/data` (ESP32 #2 heartbeat), `/fork_height` (ESP32 #3 heartbeat)
 
 ---
 
@@ -723,8 +790,9 @@ Phase 2: reads real BMS via I2C.
 | Dispatch a mission | GUI sends → WMS validates | Publishes `/wms/manual_mission` |
 | Robot state / battery / camera | **ROS topics direct** | Not via WMS |
 
-**Subscribes:** `/wms/package_list`, `/wms/mission_status`, `/wms/location_grid`
-**Publishes:** `/wms/manual_mission`
+**Subscribes (via `dashboard_server`):** `/wms/package_list`, `/wms/mission_status`, `/wms/location_grid`
+**Publishes (via `dashboard_server`):** `/wms/manual_mission` (from `POST /api/mission`)
+**Why not call the WMS REST API directly from the browser?** The WMS protocol changes from REST (Phase 1) to MQTT (Phase 2); routing through `wms_bridge_node` keeps the dashboard unchanged.
 
 ---
 
@@ -738,8 +806,8 @@ Phase 2: reads real BMS via I2C.
 | Front RGB | `CameraSensor` | `/camera/image_raw` |
 | Front Depth | `DepthCameraSensor` | `/camera/depth/image_raw` |
 | IMU | `ImuSensor` | `/imu` (raw → `odom_covariance_fix` → `/imu_fixed`) |
-| Wheel odometry | `DiffDrivePlugin` (TF publishing **disabled** — the EKF owns `odom → base_footprint`) | `/odom` (output), `/cmd_vel_out` (input — **not** `/cmd_vel`) |
-| Caster joint | Revolute + `ros_gz_bridge` | `/castor_cmd_pos` (input) |
+| Wheel odometry | `gz::sim::systems::DiffDrive` (TF publishing **disabled** — the EKF owns `odom → base_footprint`) | `/odom` (output), `/cmd_vel_out` (input — **not** `/cmd_vel`) |
+| Caster joint | Revolute + `JointPositionController` | `/castor_cmd_pos` (input) |
 | Fork joint | Prismatic + JointController | `/fork_cmd_vel` (input), `/joint_states` (output) — wrapped by `sim_fork_adapter` |
 | Simulation clock | Gazebo | `/clock` (**required** for `use_sim_time:=true`) |
 
@@ -795,7 +863,7 @@ Phase 2: reads real BMS via I2C.
   direction: ROS_TO_GZ
 
 - ros_topic_name: "/castor_cmd_pos"
-  gz_topic_name:  "/model/wafl/joint/caster_joint/cmd_pos"
+  gz_topic_name:  "/model/wafl/joint/caster_joint/cmd_pos"   # set <topic> explicitly in the plugin — the default includes the axis index (/0/cmd_pos)
   ros_type_name:  "std_msgs/msg/Float64"
   gz_type_name:   "gz.msgs.Double"
   direction: ROS_TO_GZ
@@ -842,7 +910,9 @@ ros2 launch wafl_bringup hardware.launch.py use_sim_time:=false
 
 ## 7. Master Topic Index
 
-> **QoS:** `/e_stop`, `/gui/mode`, `/robot/state` use `transient_local` (latched) so a late-joining node (GUI reconnect, restarted `base_controller`) immediately learns the current value. Sensor streams use `sensor_data` (best-effort).
+> **QoS:** `/e_stop`, `/gui/mode`, `/robot/state` use `transient_local` (latched) so a late-joining node (restarted `base_controller`, `mission_manager_node`, `dashboard_server`) immediately learns the current value. The latched sample lives in the publisher: if `dashboard_server` dies, subscribers keep their last value and manual motion stops through the command timeouts (§4.3, §5.3). Sensor and camera streams use `sensor_data` (best-effort).
+>
+> **"GUI TabN"** below means the `dashboard_server` node, which subscribes / publishes on behalf of that browser tab (§5).
 
 | Topic | Type | Publisher | Subscriber(s) |
 |-------|------|-----------|---------------|
@@ -873,6 +943,7 @@ ros2 launch wafl_bringup hardware.launch.py use_sim_time:=false
 | `/joint_states` | `JointState` | Gazebo via bridge (sim) · hardware: open (D21) | `robot_state_publisher`, `sim_fork_adapter` |
 | `/camera/image_raw` | `Image` | Kinect / Gazebo | `pallet_pose_node`, `pallet_front_angle_node`, `camera_stream_node` |
 | `/camera/depth/image_raw` | `Image` | Kinect / Gazebo | `pallet_front_angle_node` |
+| `/camera/stream/compressed` | `CompressedImage` | `camera_stream_node` | GUI Tab1 (MJPEG `/stream/camera`) |
 | `/pallet_pose` | `PoseStamped` | `pallet_pose_node` | `fork_insertion_node`, `charging_dock_node` |
 | `/pallet_location` | `String` | `pallet_pose_node` | (informational logging) |
 | `/pallet_location_id` | `String` | `pallet_pose_node` | `mission_manager_node`, `charging_dock_node` |
@@ -882,7 +953,7 @@ ros2 launch wafl_bringup hardware.launch.py use_sim_time:=false
 | `/pallet/center_yaw_rad` | `Float32` | `pallet_front_angle_node` | `fork_insertion_node` |
 | `/pallet/final_z_m` | `Float32` | `pallet_front_angle_node` | `fork_insertion_node` |
 | `/pallet/pallet_yaw_offset_rad` | `Float32` | `pallet_front_angle_node` | (logging) |
-| `/pallet/debug_image` | `CompressedImage` | `pallet_front_angle_node` | GUI Tab1 |
+| `/pallet/debug_image` | `CompressedImage` | `pallet_front_angle_node` | GUI Tab1 (MJPEG `/stream/debug`) |
 | `/wms/mission` | `WmsMission` | `wms_bridge_node` | `mission_manager_node` |
 | `/wms/manual_mission` | `String` JSON | GUI Tab3 | `wms_bridge_node` |
 | `/wms/mission_status` | `WmsMissionStatus` | `wms_bridge_node` | GUI Tab1, GUI Tab3 |
@@ -899,7 +970,7 @@ ros2 launch wafl_bringup hardware.launch.py use_sim_time:=false
 | `/charging_dock/start` | `Bool` | `mission_manager_node` | `charging_dock_node` |
 | `/charging_dock/state` | `String` | `charging_dock_node` | `mission_manager_node`, GUI Tab2 |
 | `/e_stop` | `Bool` | GUI Tab1 | `mission_manager_node`, `base_controller`, `fork_insertion_node`, `charging_dock_node` |
-| `/gui/mode` | `String` | GUI Tab1 | `mission_manager_node`, `base_controller` |
+| `/gui/mode` | `String` | GUI Tab1 | `mission_manager_node`, `base_controller`, `fork_insertion_node`, `charging_dock_node` |
 | `/rosout` | `rcl_interfaces/Log` | All nodes | GUI Tab2 |
 | `/clock` | `rosgraph_msgs/Clock` | Gazebo via `ros_gz_bridge` (sim only) | All nodes (`use_sim_time:=true`) |
 | `/tf` | `tf2_msgs/TFMessage` | EKF (`odom→base_footprint`), SLAM Toolbox (`map→odom`), `robot_state_publisher` (movable-joint frames) | Nav2, SLAM Toolbox, `mission_manager_node` (pose), GUI Tab1 (robot icon) |
@@ -979,14 +1050,14 @@ float32 progress_percent
 | D1 | SLAM algorithm | ✅ DECIDED | SLAM Toolbox async | Poor localization in Gazebo → try Cartographer |
 | D2 | Localization mode | ✅ DECIDED | SLAM Toolbox localization mode | SLAM drift → SLAM + AMCL |
 | D3 | WMS protocol | ✅ DECIDED | MQTT (Mosquitto) | Broker hard to deploy → FastAPI WebSocket |
-| D4 | GUI technology | ✅ DECIDED | PySide6 + QtWebEngine | Moving to browser → React + web_video_server |
+| D4 | GUI technology | ✅ DECIDED | Web dashboard: HTML + CSS + vanilla JS front-end, FastAPI + `rclpy` back-end (`wafl_dashboard`, §5) | Front-end outgrows vanilla JS → add a framework (e.g. Vite + React); back-end API stays |
 | D5 | WMS Phase 1 server | ✅ DECIDED | FastAPI stub | — |
-| D6 | Nav2 local planner | ⬜ OPEN | Regulated Pure Pursuit (RPP) vs DWB | RPP tracks straight warehouse aisles and curves smoothly without DWB jitter; benchmark MPPI if dynamic obstacle dodging needed |
+| D6 | Nav2 local planner | ⬜ OPEN | Leaning **Regulated Pure Pursuit** (tracks straight aisles and curves smoothly without DWB jitter, §4.3); DWB = 2026 baseline | RPP can't handle dynamic obstacles well enough in sim → benchmark MPPI |
 | D7 | Charging dock detection | ✅ DECIDED | ArUco ID=99 (reuses pipeline) | Bad lighting → IR beacon |
 | D8 | Dual encoders | ⬜ OPEN | Single encoder + IMU yaw | Poor turns → add right-wheel encoder |
 | D9 | Fork height sensing | ⬜ OPEN | Potentiometer | — |
 | D10 | Load cell | ⬜ OPEN | Skipped | Needed for CONFIRM state reliability |
-| D11 | Camera streaming | ✅ DECIDED | MJPEG over TCP | Browser GUI → WebRTC |
+| D11 | Camera streaming | ✅ DECIDED | `camera_stream_node` (JPEG, 15 fps) → `dashboard_server` → MJPEG over HTTP (`<img>` tag) | Latency / Wi-Fi bandwidth too high → WebRTC |
 | D12 | Fork handoff mechanism | ⬜ OPEN | Three overlapping paths exist today: `/mission_manager/fork_goal` topic, `insert_forks` action, `/fork_insertion/done` topic | **Recommend action only** (goal/result/feedback/cancel); delete the topic pair |
 | D13 | Who owns `DROP` | ⬜ OPEN | Listed in both `mission_manager` and `fork_insertion_node` state machines | Recommend `InsertForks.action` goal gets an `operation` field (PICKUP \| DROP); `mission_manager` owns NAVIGATE_TO_DROP only |
 | D14 | Unused interfaces | ⬜ OPEN | `Alarm.msg` and `SetMission.srv` have no publisher / server | Wire `/alarms` + a service, or delete them |
@@ -995,8 +1066,9 @@ float32 progress_percent
 | D17 | GUI robot pose source | ✅ DECIDED | TF `map → base_footprint` (`/odometry/filtered` is odom-frame and drifts against the map) | — |
 | D18 | Averaged pallet topics | ✅ DECIDED | Averaging is internal; only the averaged values are published on the topics in §7 (no `_avg` variants) | — |
 | D19 | IMU part | ⬜ OPEN | MPU-6050 is 6-DOF (no magnetometer → yaw drifts); BNO055 gives fused orientation | Prefer BNO055 |
-| D20 | Manual mode vs Nav2 lifecycle | ⬜ OPEN | Currently "deactivate Nav2 lifecycle nodes" (slow, costmaps restart) | Recommend: cancel the goal and let `base_controller` arbitrate |
+| D20 | Manual mode vs Nav2 lifecycle | ⬜ OPEN | Proposed (used in §4.5): cancel the active goal and let `base_controller` arbitrate. Deactivating Nav2 lifecycle nodes is rejected (slow, costmaps restart) | Confirm in sim; revisit only if goal cancel proves unreliable |
 | D21 | Hardware `/joint_states` | ⬜ OPEN | Nothing publishes it on hardware, so `robot_state_publisher` has no caster / fork frames | `base_controller` publishes the caster joint (last `/target_angle`) + a fork-height → joint adapter, or make those joints fixed in the hardware URDF |
+| D22 | Dashboard access & control | ⬜ OPEN | Phase 1: LAN only, no login; every open browser can send commands | Before hardware demos: one "controller" browser at a time (others view-only) + a shared access token |
 
 ### Research Links
 
@@ -1004,12 +1076,15 @@ float32 progress_percent
 |-------|-------|
 | SLAM Toolbox | https://github.com/SteveMacenski/slam_toolbox |
 | Cartographer ROS | https://google-cartographer-ros.readthedocs.io |
-| Nav2 SLAM guide | https://navigation.ros.org/tutorials/docs/navigation2_with_slam.html |
-| MPPI planner | https://navigation.ros.org/configuration/packages/configuring-mppic.html |
-| DWB planner | https://navigation.ros.org/configuration/packages/configuring-dwb-controller.html |
+| Nav2 SLAM guide | https://docs.nav2.org/tutorials/docs/navigation2_with_slam.html |
+| Regulated Pure Pursuit | https://docs.nav2.org/configuration/packages/configuring-regulated-pp.html |
+| MPPI planner | https://docs.nav2.org/configuration/packages/configuring-mppic.html |
+| DWB planner | https://docs.nav2.org/configuration/packages/configuring-dwb-controller.html |
 | MQTT (Mosquitto) | https://mosquitto.org/ |
 | Paho-MQTT Python | https://pypi.org/project/paho-mqtt/ |
 | FastAPI WebSocket | https://fastapi.tiangolo.com/advanced/websockets/ |
+| FastAPI StreamingResponse (MJPEG) | https://fastapi.tiangolo.com/advanced/custom-response/#streamingresponse |
+| FastAPI lifespan (start rclpy thread) | https://fastapi.tiangolo.com/advanced/events/ |
 
 ---
 
@@ -1026,9 +1101,10 @@ float32 progress_percent
 | Caster | `/castor_cmd_pos` (Gazebo joint) | `/target_angle` → ESP32 #2 |
 | Driving | Gazebo DiffDrive plugin ← `/cmd_vel_out` | `/target_speed_left`, `/target_speed_right` → ESP32 #1 (PID on the ESP32) |
 | Lift | Gazebo prismatic joint via `sim_fork_adapter` | `/lift_cmd` → ESP32 #3 |
-| Fork height | `sim_fork_adapter` from joint state | Potentiometer → ESP32 #3 → `/fork_height` |
+| Fork height | `sim_fork_adapter` from joint state | Potentiometer or encoder (D9 open) → ESP32 #3 → `/fork_height` |
 | Clock | `/clock` from Gazebo bridge | System clock |
 | WMS | FastAPI stub (localhost) | Real WMS server (networked) |
+| Dashboard | `dashboard_server` on the laptop / container → browser at `http://localhost:8000` | `dashboard_server` on the Jetson → operator browser at `http://<jetson-ip>:8000` |
 | Charging dock | ArUco ID=99 in world model | Real dock with ArUco marker |
 | `use_sim_time` (clock) | `true` | `false` |
 | `sim` (mode) | `true` | `false` |
@@ -1038,31 +1114,36 @@ float32 progress_percent
 
 ## 11. How to Run
 
+> The dashboard is started by both bringup launch files — there is no separate GUI process. Open **http://localhost:8000** (sim) or **http://\<jetson-ip\>:8000** (hardware) in any browser.
+
 ### Docker (Recommended)
 ```bash
+# All commands from the repo root — the compose file lives in docker/
+
 # First time
-docker compose build
+docker compose -f docker/docker-compose.yml build
 
-# Start simulation
-docker compose up -d
+# Terminal 1 — WMS stub (start first so wms_bridge_node connects immediately; it retries otherwise)
+cd wms_server && uvicorn main:app --host 0.0.0.0 --port 8080
 
-# GUI (separate terminal)
-cd dashboard && python3 main.py
+# Terminal 2 — simulation (Gazebo + SLAM + Nav2 + perception + dashboard_server)
+docker compose -f docker/docker-compose.yml up -d
 
-# WMS stub
-cd wms_server && uvicorn main:app --port 8080
+# GUI: open in a browser
+xdg-open http://localhost:8000
 ```
+> `docker-compose.yml` uses `network_mode: host`, so DDS discovery works and ports 8000 / 8080 are reachable without extra port mapping.
 
 ### Native — Simulation
 ```bash
-# Terminal 1
+# Terminal 1 — WMS stub
+cd wms_server && uvicorn main:app --port 8080
+
+# Terminal 2 — full simulation (includes dashboard_server)
 ros2 launch wafl_bringup simulation.launch.py use_sim_time:=true
 
-# Terminal 2
-cd dashboard && python3 main.py
-
-# Terminal 3
-cd wms_server && uvicorn main:app --port 8080
+# Browser
+xdg-open http://localhost:8000
 ```
 
 ### Native — Real Hardware
@@ -1070,12 +1151,19 @@ cd wms_server && uvicorn main:app --port 8080
 # Jetson: Terminal 1 (start BEFORE powering ESP32s)
 ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
 
-# Jetson: Terminal 2
+# Jetson: Terminal 2 (includes dashboard_server)
 ros2 launch wafl_bringup hardware.launch.py use_sim_time:=false
 
-# Operator laptop: GUI
-cd dashboard && python3 main.py
+# Operator laptop: browser only — no ROS install needed
+#   http://<jetson-ip>:8000
 ```
+
+### Dashboard Only (GUI development)
+```bash
+# Restart only the dashboard against an already-running sim / robot
+ros2 launch wafl_dashboard dashboard.launch.py port:=8000
+```
+Front-end files (`static/`) are plain HTML/JS/CSS — no npm, no build step. After editing, run `colcon build --packages-select wafl_dashboard`, restart the dashboard and refresh the browser.
 
 ### Debug Commands
 ```bash
@@ -1083,7 +1171,9 @@ ros2 node list                          # all running nodes
 ros2 topic list -t                      # all topics + types
 ros2 topic echo /robot/state            # monitor state
 ros2 topic hz /odometry/filtered        # should be ~50 Hz
+ros2 topic hz /camera/stream/compressed # should be ~15 Hz
 ros2 run tf2_tools view_frames          # check TF tree
+curl http://localhost:8000/api/health   # dashboard view of node / ESP32 / WMS health
 ```
 
 ---
@@ -1100,6 +1190,7 @@ ros2 run tf2_tools view_frames          # check TF tree
 8. **`wafl_interfaces` is built first, always** — if you change a `.msg` file, tell everyone immediately
 9. **TensorRT `.engine` files go in `wafl_perception/models/`** — gitignored, never commit
 10. **Log with `self.get_logger()`, not `print()`** — logs appear in GUI Tab 2 automatically
+11. **The browser never talks to ROS directly** — every new GUI feature is a `dashboard_server` endpoint or WebSocket message type, documented in §5.2
 
 ---
 
