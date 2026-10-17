@@ -728,10 +728,11 @@ WAFL_2027/
 |   |   |-- config/nav2_params.yaml
 |   |   `-- launch/navigation.launch.py
 |   |
-|   |-- wafl_perception/             <- ArUco + YOLO + debug image
+|   |-- wafl_perception/             <- ArUco + YOLO + camera stream + debug image
 |   |   |-- wafl_perception/
 |   |   |   |-- pallet_pose_node.py
-|   |   |   `-- pallet_front_angle_node.py
+|   |   |   |-- pallet_front_angle_node.py
+|   |   |   `-- camera_stream_node.py     (P1 priority)
 |   |   |-- models/                  <- TensorRT .engine files (NOT in git)
 |   |   |-- config/locations.yaml    <- pallet location DB (replaces hardcoded dict)
 |   |   `-- launch/ (aruco.launch.py, yolo.launch.py, perception.launch.py)
@@ -740,11 +741,10 @@ WAFL_2027/
 |   |   |-- wafl_fork_insertion/fork_insertion_node.py
 |   |   `-- launch/fork_insertion.launch.py
 |   |
-|   |-- wafl_mission/                <- mission manager + WMS bridge + camera stream
+|   |-- wafl_mission/                <- mission manager + WMS bridge
 |   |   |-- wafl_mission/
 |   |   |   |-- mission_manager_node.py   (STUB in P1)
-|   |   |   |-- wms_bridge_node.py        (STUB in P1)
-|   |   |   `-- camera_stream_node.py     (P1 priority)
+|   |   |   `-- wms_bridge_node.py        (STUB in P1)
 |   |   `-- config/wms_config.yaml
 |   |
 |   |-- wafl_energy/                 <- battery + charging dock

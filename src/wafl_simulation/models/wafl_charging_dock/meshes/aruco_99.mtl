@@ -1,0 +1,5 @@
+newmtl aruco_99
+Ka 1 1 1
+Kd 1 1 1
+Ks 0 0 0
+map_Kd aruco_99.png

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!-- Wrapper: includes the UNCHANGED 2025 robot + sim plugins, and adds the frame names
+     the sim contract expects (laser_link, camera_link) as fixed children of the 2025 links. -->
+<robot name="wafl" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:include filename="$(find wafl_description)/urdf/WAFL2025.xacro"/>
+  <xacro:include filename="$(find wafl_simulation)/urdf/wafl_gz_plugins.xacro"/>
+
+  <link name="laser_link">
+    <inertial><mass value="0.01"/><inertia ixx="1e-5" ixy="0" ixz="0" iyy="1e-5" iyz="0" izz="1e-5"/></inertial>
+  </link>
+  <joint name="laser_link_joint" type="fixed">
+    <parent link="laser"/><child link="laser_link"/><origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="camera_link">
+    <inertial><mass value="0.01"/><inertia ixx="1e-5" ixy="0" ixz="0" iyy="1e-5" iyz="0" izz="1e-5"/></inertial>
+  </link>
+  <joint name="camera_link_joint" type="fixed">
+    <parent link="kinect_link"/><child link="camera_link"/><origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+</robot>

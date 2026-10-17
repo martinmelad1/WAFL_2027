@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+<model name="wafl_pallet_3">
+  <static>false</static>
+  <link name="link">
+    <inertial><pose>0 0 0.196 0 0 0</pose><mass>9</mass><inertia><ixx>1.49515</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.89515</iyy><iyz>0</iyz><izz>1.56</izz></inertia></inertial>
+    <collision name="deck"><pose>0 0 0.133 0 0 0</pose><geometry><box><size>0.8 1.2 0.022</size></box></geometry><surface><friction><ode><mu>1</mu><mu2>1</mu2></ode></friction></surface></collision>
+    <collision name="column_0"><pose>0 -0.5275 0.061 0 0 0</pose><geometry><box><size>0.8 0.145 0.122</size></box></geometry><surface><friction><ode><mu>1</mu><mu2>1</mu2></ode></friction></surface></collision>
+    <collision name="column_1"><pose>0 0 0.061 0 0 0</pose><geometry><box><size>0.8 0.145 0.122</size></box></geometry><surface><friction><ode><mu>1</mu><mu2>1</mu2></ode></friction></surface></collision>
+    <collision name="column_2"><pose>0 0.5275 0.061 0 0 0</pose><geometry><box><size>0.8 0.145 0.122</size></box></geometry><surface><friction><ode><mu>1</mu><mu2>1</mu2></ode></friction></surface></collision>
+    <collision name="cargo"><pose>0 0 0.444 0 0 0</pose><geometry><box><size>0.7 1 0.6</size></box></geometry><surface><friction><ode><mu>1</mu><mu2>1</mu2></ode></friction></surface></collision>
+    <visual name="board_0"><pose>-0.3275 0 0.133 0 0 0</pose><geometry><box><size>0.145 1.2 0.022</size></box></geometry><material><ambient>0.76 0.6 0.42 1</ambient><diffuse>0.76 0.6 0.42 1</diffuse><specular>0.1 0.1 0.1 1</specular></material></visual>
+    <visual name="board_1"><pose>-0.16375 0 0.133 0 0 0</pose><geometry><box><size>0.145 1.2 0.022</size></box></geometry><material><ambient>0.76 0.6 0.42 1</ambient><diffuse>0.76 0.6 0.42 1</diffuse><specular>0.1 0.1 0.1 1</specular></material></visual>
+    <visual name="board_2"><pose>0 0 0.133 0 0 0</pose><geometry><box><size>0.145 1.2 0.022</size></box></geometry><material><ambient>0.76 0.6 0.42 1</ambient><diffuse>0.76 0.6 0.42 1</diffuse><specular>0.1 0.1 0.1 1</specular></material></visual>
+    <visual name="board_3"><pose>0.16375 0 0.133 0 0 0</pose><geometry><box><size>0.145 1.2 0.022</size></box></geometry><material><ambient>0.76 0.6 0.42 1</ambient><diffuse>0.76 0.6 0.42 1</diffuse><specular>0.1 0.1 0.1 1</specular></material></visual>
+    <visual name="board_4"><pose>0.3275 0 0.133 0 0 0</pose><geometry><box><size>0.145 1.2 0.022</size></box></geometry><material><ambient>0.76 0.6 0.42 1</ambient><diffuse>0.76 0.6 0.42 1</diffuse><specular>0.1 0.1 0.1 1</specular></material></visual>
+    <visual name="block_00"><pose>-0.3275 -0.5275 0.072 0 0 0</pose><geometry><box><size>0.145 0.145 0.1</size></box></geometry><material><ambient>0.76 0.6 0.42 1</ambient><diffuse>0.76 0.6 0.42 1</diffuse><specular>0.1 0.1 0.1 1</specular></material></visual>
+    <visual name="block_01"><pose>-0.3275 0 0.072 0 0 0</pose><geometry><box><size>0.145 0.145 0.1</size></box></geometry><material><ambient>0.76 0.6 0.42 1</ambient><diffuse>0.76 0.6 0.42 1</diffuse><specular>0.1 0.1 0.1 1</specular></material></visual>
+    <visual name="block_02"><pose>-0.3275 0.5275 0.072 0 0 0</pose><geometry><box><size>0.145 0.145 0.1</size></box></geometry><material><ambient>0.76 0.6 0.42 1</ambient><diffuse>0.76 0.6 0.42 1</diffuse><specular>0.1 0.1 0.1 1</specular></material></visual>
+    <visual name="block_10"><pose>0 -0.5275 0.072 0 0 0</pose><geometry><box><size>0.145 0.145 0.1</size></box></geometry><material><ambient>0.76 0.6 0.42 1</ambient><diffuse>0.76 0.6 0.42 1</diffuse><specular>0.1 0.1 0.1 1</specular></material></visual>
+    <visual name="block_11"><pose>0 0 0.072 0 0 0</pose><geometry><box><size>0.145 0.145 0.1</size></box></geometry><material><ambient>0.76 0.6 0.42 1</ambient><diffuse>0.76 0.6 0.42 1</diffuse><specular>0.1 0.1 0.1 1</specular></material></visual>
+    <visual name="block_12"><pose>0 0.5275 0.072 0 0 0</pose><geometry><box><size>0.145 0.145 0.1</size></box></geometry><material><ambient>0.76 0.6 0.42 1</ambient><diffuse>0.76 0.6 0.42 1</diffuse><specular>0.1 0.1 0.1 1</specular></material></visual>
+    <visual name="block_20"><pose>0.3275 -0.5275 0.072 0 0 0</pose><geometry><box><size>0.145 0.145 0.1</size></box></geometry><material><ambient>0.76 0.6 0.42 1</ambient><diffuse>0.76 0.6 0.42 1</diffuse><specular>0.1 0.1 0.1 1</specular></material></visual>
+    <visual name="block_21"><pose>0.3275 0 0.072 0 0 0</pose><geometry><box><size>0.145 0.145 0.1</size></box></geometry><material><ambient>0.76 0.6 0.42 1</ambient><diffuse>0.76 0.6 0.42 1</diffuse><specular>0.1 0.1 0.1 1</specular></material></visual>
+    <visual name="block_22"><pose>0.3275 0.5275 0.072 0 0 0</pose><geometry><box><size>0.145 0.145 0.1</size></box></geometry><material><ambient>0.76 0.6 0.42 1</ambient><diffuse>0.76 0.6 0.42 1</diffuse><specular>0.1 0.1 0.1 1</specular></material></visual>
+    <visual name="runner_0"><pose>0 -0.5275 0.011 0 0 0</pose><geometry><box><size>0.8 0.145 0.022</size></box></geometry><material><ambient>0.76 0.6 0.42 1</ambient><diffuse>0.76 0.6 0.42 1</diffuse><specular>0.1 0.1 0.1 1</specular></material></visual>
+    <visual name="runner_1"><pose>0 0 0.011 0 0 0</pose><geometry><box><size>0.8 0.145 0.022</size></box></geometry><material><ambient>0.76 0.6 0.42 1</ambient><diffuse>0.76 0.6 0.42 1</diffuse><specular>0.1 0.1 0.1 1</specular></material></visual>
+    <visual name="runner_2"><pose>0 0.5275 0.011 0 0 0</pose><geometry><box><size>0.8 0.145 0.022</size></box></geometry><material><ambient>0.76 0.6 0.42 1</ambient><diffuse>0.76 0.6 0.42 1</diffuse><specular>0.1 0.1 0.1 1</specular></material></visual>
+    <visual name="cargo"><pose>0 0 0.444 0 0 0</pose><geometry><box><size>0.7 1 0.6</size></box></geometry><material><ambient>0.65 0.5 0.35 1</ambient><diffuse>0.65 0.5 0.35 1</diffuse><specular>0.1 0.1 0.1 1</specular></material></visual>
+    <visual name="aruco_3"><cast_shadows>false</cast_shadows><pose>-0.3505 0 0.444 0 0 0</pose><geometry><mesh><uri>model://wafl_pallet_3/meshes/aruco_3.obj</uri></mesh></geometry></visual>
+  </link>
+</model>
+</sdf>

@@ -66,8 +66,8 @@ We build in two phases. **Phase 2 cannot start until Phase 1 is solid.**
 ║  wafl_simulation   →  Gazebo world + ros_gz_bridge           ║
 ║  wafl_localization →  EKF + SLAM Toolbox (sim mode)          ║
 ║  wafl_navigation   →  Nav2 + unified base_controller         ║
-║  wafl_perception   →  ArUco + YOLO (CPU mode in sim)         ║
-║  wafl_mission      →  camera_stream_node + STUBS for rest    ║
+║  wafl_perception   →  ArUco + YOLO + camera_stream_node      ║
+║  wafl_mission      →  STUBS (mission manager, WMS bridge)    ║
 ║  wafl_fork_insertion / wafl_energy  →  STUB nodes (fake data)║
 ║  wafl_dashboard    →  FastAPI + HTML/JS web GUI (3 tabs)     ║
 ║  wafl_bringup      →  simulation / hardware launch files     ║
@@ -168,10 +168,11 @@ WAFL_2027/
 │   │   └── launch/
 │   │       └── navigation.launch.py
 │   │
-│   ├── wafl_perception/             ← ArUco + YOLO + debug image
+│   ├── wafl_perception/             ← ArUco + YOLO + camera stream + debug image
 │   │   ├── wafl_perception/
 │   │   │   ├── pallet_pose_node.py
-│   │   │   └── pallet_front_angle_node.py
+│   │   │   ├── pallet_front_angle_node.py
+│   │   │   └── camera_stream_node.py    ← Phase 1 priority
 │   │   ├── models/                  ← TensorRT .engine files (NOT in git)
 │   │   ├── config/
 │   │   │   └── locations.yaml       ← pallet location DB (shared YAML)
@@ -186,11 +187,10 @@ WAFL_2027/
 │   │   └── launch/
 │   │       └── fork_insertion.launch.py
 │   │
-│   ├── wafl_mission/                ← Mission manager + WMS bridge + camera stream
+│   ├── wafl_mission/                ← Mission manager + WMS bridge
 │   │   ├── wafl_mission/
 │   │   │   ├── mission_manager_node.py  ← STUB in Phase 1
-│   │   │   ├── wms_bridge_node.py       ← STUB in Phase 1
-│   │   │   └── camera_stream_node.py    ← Phase 1 priority
+│   │   │   └── wms_bridge_node.py       ← STUB in Phase 1
 │   │   └── config/
 │   │       └── wms_config.yaml
 │   │
@@ -506,8 +506,6 @@ Gazebo's DiffDrive TF publishing **must be disabled**, otherwise two nodes publi
 
 ---
 
-### 4.5 Mission, WMS & Fork Layer — `wafl_mission`, `wafl_fork_insertion`
-
 #### `camera_stream_node` `[P1]`
 
 **Purpose:** Produce a lightweight, rate-limited JPEG stream of the front camera for the web dashboard. Raw 640×480 RGB at 30 fps is ~27 MB/s — far too heavy to push to a browser over Wi-Fi.
@@ -521,6 +519,8 @@ Gazebo's DiffDrive TF publishing **must be disabled**, otherwise two nodes publi
 **Implementation:** throttle to `fps` → optional resize → `cv2.imencode('.jpg', frame)` → publish. `dashboard_server` re-serves these bytes to browsers as MJPEG (`/stream/camera`, §5.2) without re-encoding.
 
 ---
+
+### 4.5 Mission, WMS & Fork Layer — `wafl_mission`, `wafl_fork_insertion`
 
 #### `wms_bridge_node` `[P1 STUB → P2 REAL]`
 
