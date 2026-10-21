@@ -1,90 +1,57 @@
-# WAFL 2027 — Web Dashboard
+# WAFL 2027 dashboard
 
-Web dashboard (HTML/CSS/JS + FastAPI backend) for the warehouse forklift: live map, camera, robot status, Auto/Manual mode, manual drive and E-STOP.
+This is the browser UI and ROS 2 bridge for the WAFL autonomous forklift. FastAPI runs on the ROS machine (sim host or Jetson); the operator browser does not need ROS or DDS.
 
-> The root README (§5, D4) still says PySide6. The agreed decision is **HTML + FastAPI**.
+## Request and data flow
 
-## Status
-
-| Part | Status |
-|------|--------|
-| `frontend/` layout, styling, responsive (desktop + phone) | Done |
-| Tab switching, Auto/Manual toggle (UI only) | Done |
-| `backend/main.py` (FastAPI + rclpy) | Not started |
-| Live data, commands, map and camera rendering | Not started |
-| Tab 2 (Logs), Tab 3 (WMS) | Placeholders |
-
-## Structure
-
+```text
+Browser: static HTML/CSS/JS
+  ├─ WebSocket /ws: status, pose, mission and health updates; joystick commands
+  ├─ HTTP /api/*: snapshots, map PNG, safety/mode/manual commands
+  └─ HTTP /stream/*: MJPEG camera bytes
+             ↕
+FastAPI routes + DashboardRosNode (rclpy spins in a background thread)
+             ↕ local ROS 2 topics / DDS
 ```
-forklift_dashboard/
-├── backend/main.py        ← FastAPI + ROS 2 bridge (todo)
-└── frontend/
-    ├── index.html         ← structure
-    ├── style.css          ← design
-    └── script.js          ← behaviour
-```
+
+FastAPI owns the browser-facing protocols and serves `static/`. `DashboardRosNode` owns ROS subscriptions and publishers. ROS callbacks update the latest snapshot and forward events to connected browsers using the asyncio event loop. ROS never runs on FastAPI's event-loop thread. Run one Uvicorn worker because each worker would create a separate ROS node and duplicate publishers.
 
 ## Run
 
-Open `frontend/index.html` in a browser. For a phone on the same Wi-Fi:
+Build and source the workspace (ROS 2 Jazzy must be installed):
 
 ```bash
-cd frontend && python3 -m http.server 8000
+cd <workspace>
+rosdep install --from-paths src --ignore-src -r -y
+sudo apt update
+sudo apt install python3-fastapi python3-uvicorn python3-pil
+colcon build --packages-select wafl_dashboard
+source install/setup.bash
+ros2 launch wafl_dashboard dashboard.launch.py port:=8000
 ```
 
-then open `http://<laptop-ip>:8000` (`hostname -I` shows the IP).
+Open `http://localhost:8000`. Ubuntu 24.04 marks its system Python as externally managed, so install the dashboard libraries with `apt` rather than system-wide `pip`. Ubuntu Noble provides these Python packages in its repositories. The page and its CSS/JS must be served by FastAPI; opening `index.html` directly or with `python -m http.server` does not provide the API/WebSocket.
 
-## For the backend: how the page is wired
+## Routes and topics
 
-`script.js` finds elements by `id` (do not rename them):
+| Browser endpoint | ROS connection |
+|---|---|
+| `GET /` and `/css/*`, `/js/*` | Serves the dashboard files |
+| `WS /ws` | Snapshot + live status/pose/battery/map/health/log updates; incoming `{"type":"joy","v":0.3,"w":0}` |
+| `GET /api/snapshot`, `/api/health`, `/api/logs` | Latest ROS data and log ring buffer |
+| `GET /api/map.png`, `/api/map/meta` | `/map` occupancy grid rendered as PNG, plus geometry |
+| `GET /stream/camera`, `/stream/debug` | `/camera/stream/compressed`, `/pallet/debug_image` as MJPEG |
+| `POST /api/estop` | `/e_stop`; activation also publishes `/gui/mode = MANUAL` |
+| `POST /api/mode` | `/gui/mode`; refuses AUTO if E-stop is latched |
+| WebSocket joystick, `POST /api/lift`, `/api/lights` | `/manual_cmd_vel`, `/lift_cmd`, `/lights_cmd`; only accepted in MANUAL and without E-stop |
+| `POST /api/mission` | JSON on `/wms/manual_mission` (`std_msgs/String`) |
 
-- **Values:** `status-state`, `status-position`, `status-heading`, `status-speed`, `status-battery`, `status-fork`, `status-package`, `status-quantity`, `status-weight`, `status-eta`, `mission-id`, `mission-from`, `mission-to`
-- **LEDs** (`system-led`, `mission-progress`, `mission-done`, `safety-normal`, `safety-obstacle`, `safety-estop`): add the class `green`, `amber` or `red`.
-- **Battery bar:** `battery-bar` — set `width` in %.
-- **Map / camera:** `map-canvas`, `camera-feed` (set `src`).
-- **Buttons:** `estop`, `mode-auto`, `mode-manual`. Manual buttons use `data-cmd`: `forward`, `backward`, `left`, `right`, `lift-up`, `lift-down`, `lights-on`, `lights-off`.
+Subscriptions include `/map`, TF `map → base_footprint`, `/odometry/filtered`, `/plan`, `/robot/state`, `/fork_height`, `/battery/state`, `/wms/mission_status`, `/wms/package_list`, `/wms/location_grid`, `/wms/connection_status`, `/rosout`, `/camera/stream/compressed`, and `/pallet/debug_image`. ESP32 heartbeat timestamps use `/encoder_count`, `/imu/data`, and `/fork_height`.
 
-## Data format (JSON) — proposal, needs team approval
+The browser sends joystick commands at 10 Hz while a control is held and sends zero on release. The server publishes zero after 0.3 seconds without a joystick update and when a WebSocket closes. The base controller's 0.5 second command timeout is another layer. This web E-stop is a software command over the network; it is not a substitute for the physical power-cut E-stop described in the root README.
 
-Backend → dashboard:
+This checkout does not yet contain `wafl_interfaces` or the other ROS application packages described in the root README. The dashboard therefore treats the custom mission message as an optional runtime dependency: mission status appears once `wafl_interfaces` is built and sourced. The ordinary ROS message subscriptions and browser server can still start without it.
 
-```json
-{
-  "system_online": true, "mode": "auto", "state": "NAVIGATE",
-  "battery": 85, "speed": 0.8, "fork_height_cm": 0, "heading_deg": 90,
-  "position": { "x": 1.2, "y": 3.4 },
-  "safety": "normal",
-  "mission": { "id": "M-001", "from": "Zone A", "to": "Zone B", "status": "in_progress", "eta_s": 120 },
-  "package": { "id": "P-042", "quantity": 4, "weight_kg": 120 }
-}
-```
+## Current page limitations
 
-`safety`: `normal` | `obstacle` | `estop` · `mission.status`: `in_progress` | `completed`
-
-Dashboard → backend:
-
-```json
-{ "type": "estop",  "value": true }
-{ "type": "mode",   "value": "manual" }
-{ "type": "move",   "command": "forward" }
-{ "type": "lift",   "command": "up" }
-{ "type": "lights", "command": "on" }
-```
-
-## ROS 2 topics
-
-| Subscribe | Used for |
-|-----------|----------|
-| `/map`, TF `map→base_footprint`, `/plan` | map, robot pose, path |
-| `/odometry/filtered` | speed |
-| `/robot/state`, `/fork_height`, `/battery/state` | status |
-| `/wms/mission_status` | mission |
-
-| Publish | When |
-|---------|------|
-| `/e_stop` (`Bool`), `/gui/mode` (`String`) | E-STOP, mode toggle — use `transient_local` QoS |
-| `/manual_cmd_vel` (`Twist`) | drive arrows, **Manual only** |
-| `/lift_cmd` (`Int32`), `/lights_cmd` (`Int32MultiArray`) | fork / lights, **Manual only** |
-
-Drive must stop when the button is released or the connection drops.
+The checked-in HTML currently has the Robot view wired for telemetry, map, camera and manual controls. Logs and WMS tabs are placeholders even though the API carries log and WMS messages. The current subscribed topics do not provide package quantity, payload weight, or ETA, so those fields cannot yet show live values. Mission status is a custom `wafl_interfaces/WmsMissionStatus` message; package and location snapshots from the WMS bridge are JSON strings as specified by the root README.
