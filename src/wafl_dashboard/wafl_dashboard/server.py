@@ -125,7 +125,9 @@ def joy(req: JoyRequest):
 @app.post("/api/lift")
 def lift(req: LiftRequest):
     n = ros(); manual_only(n)
-    n.pub_lift.publish(Int32(data=req.cmd)); return {"accepted": True}
+    try: n.lift(req.cmd)
+    except ValueError as e: raise HTTPException(409, str(e))
+    return {"accepted": True}
 
 @app.post("/api/lights")
 def lights(req: LightsRequest):
@@ -172,7 +174,7 @@ async def websocket(websocket: WebSocket):
     except WebSocketDisconnect: pass
     finally:
         async with clients_lock: clients.discard(websocket)
-        ros().stop()
+        ros().stop(); ros().stop_lift()
 
 
 def main():

@@ -37,6 +37,7 @@ class DashboardRosNode(Node):
         }
         self.logs = deque(maxlen=500)
         self.last_seen = {}
+        self.last_lift_time = None
         self.map_png, self.map_meta = None, None
         self.camera = {"camera": None, "debug": None}
         self.tf_buffer = Buffer()
@@ -87,8 +88,14 @@ class DashboardRosNode(Node):
 
     def heartbeat(self, topic): self.last_seen[topic] = time.monotonic()
     def on_state(self, msg): self.data["state"] = msg.data; self.emit("status", self.status_payload())
-    def on_mode(self, msg): self.data["mode"] = msg.data.upper(); self.emit("status", self.status_payload())
-    def on_estop(self, msg): self.data["estop"] = bool(msg.data); self.emit("status", self.status_payload())
+    def on_mode(self, msg):
+        self.data["mode"] = msg.data.upper()
+        if self.data["mode"] != "MANUAL": self.stop(); self.stop_lift()
+        self.emit("status", self.status_payload())
+    def on_estop(self, msg):
+        self.data["estop"] = bool(msg.data)
+        if self.data["estop"]: self.stop(); self.stop_lift()
+        self.emit("status", self.status_payload())
     def on_fork(self, msg): self.data["fork_height_mm"] = float(msg.data); self.heartbeat("/fork_height")
 
     def on_battery(self, msg):
@@ -163,14 +170,30 @@ class DashboardRosNode(Node):
     def publish_status(self): self.emit("status", self.status_payload())
     def publish_health(self): self.emit("health", self.health_payload())
     def deadman(self):
-        if self.data.get("mode") != "MANUAL": return
-        if self.last_joy_time is not None and time.monotonic() - self.last_joy_time > 0.3:
+        if self.last_joy_time is not None and (
+                self.data.get("mode") != "MANUAL" or self.data.get("estop") or
+                time.monotonic() - self.last_joy_time > 0.3):
             self.pub_cmd.publish(Twist()); self.last_joy_time = None
+        if self.last_lift_time is not None and (
+                self.data.get("mode") != "MANUAL" or self.data.get("estop") or
+                time.monotonic() - self.last_lift_time > 0.3):
+            self.stop_lift()
     last_joy_time = None
 
     def joy(self, v, w):
         if self.data["mode"] != "MANUAL": raise ValueError("Manual drive requires MANUAL mode")
         msg = Twist(); msg.linear.x = float(v); msg.angular.z = float(w)
         self.pub_cmd.publish(msg); self.last_joy_time = time.monotonic()
+
+    def lift(self, cmd):
+        if cmd in (1, 2) and (self.data["mode"] != "MANUAL" or self.data["estop"]):
+            raise ValueError("Lift commands require MANUAL mode with E-stop clear")
+        self.pub_lift.publish(Int32(data=int(cmd)))
+        self.last_lift_time = time.monotonic() if cmd in (1, 2) else None
+
+    def stop_lift(self):
+        if self.last_lift_time is not None:
+            self.pub_lift.publish(Int32(data=0))
+            self.last_lift_time = None
 
     def stop(self): self.pub_cmd.publish(Twist()); self.last_joy_time = None
