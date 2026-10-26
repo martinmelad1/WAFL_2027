@@ -91,7 +91,7 @@ We build in two phases. **Phase 2 cannot start until Phase 1 is solid.**
 **Phase 1 Checklist:**
 - [ ] `wafl_interfaces` — all custom msgs/srvs/actions compiled
 - [ ] URDF spawning in Gazebo Harmonic without errors
-- [ ] Robot drives in Gazebo when `base_controller` publishes `/cmd_vel_out` (Gazebo never reads raw `/cmd_vel`)
+- [ ] Robot drives and steers in Gazebo when `base_controller` publishes the per-joint sim commands (§4.3, §6) — Gazebo never reads raw `/cmd_vel`
 - [ ] SLAM Toolbox builds a map; map visible in RViz
 - [ ] Nav2 sends robot to a goal pose autonomously
 - [ ] ArUco node detects simulated pallet markers
@@ -101,6 +101,7 @@ We build in two phases. **Phase 2 cannot start until Phase 1 is solid.**
 - [ ] GUI Tab 3 shows stub packages + missions from the FastAPI WMS stub (via the `wms_bridge_node` stub)
 - [ ] E-STOP button halts robot immediately; RESET E-STOP → RESUME AUTO recovers it
 - [ ] Manual joystick mode works: browser → `dashboard_server` → `/manual_cmd_vel` → robot moves; releasing the key stops it
+- [ ] Dashboard drive modes work in sim: NORMAL, CRAB (sideways) and JOINT jog (front steering, rear steering, each front wheel, lift)
 
 ---
 
@@ -264,24 +265,25 @@ ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
 
 | Direction | Topic | Type | Notes |
 |-----------|-------|------|-------|
-| Sub | `/target_speed_left` | `Float32` | Target speed (m/s) for left drive; ESP32 runs the PID against encoder feedback |
-| Sub | `/target_speed_right` | `Float32` | Target speed (m/s) for right drive; ESP32 runs the PID against encoder feedback |
-| Pub | `/encoder_count` | `Float32` | Raw encoder ticks (left wheel) |
+| Sub | `/target_speed_left` | `Float32` | Target speed (m/s) for the **front-left** drive wheel; ESP32 runs the PID against encoder feedback |
+| Sub | `/target_speed_right` | `Float32` | Target speed (m/s) for the **front-right** drive wheel; ESP32 runs the PID against encoder feedback |
+| Pub | `/encoder_count` | `Float32` | Raw encoder ticks (front-left wheel) |
 
-Hardware: 2× DC motors + H-bridge, 1× encoder (600 PPR, gear ratio ≈ 3.14)
+Hardware: 2× DC motors + H-bridge (one per **front** drive wheel, beside the forks; the rear wheel is not driven), 1× encoder (600 PPR, gear ratio ≈ 3.14)
 **Control:** the ESP32 closes the speed loop (PID) itself and owns the tick→speed conversion; its wheel radius / gear ratio must match the `encoder_velocity_node` params.
-> ⚠️ With a single encoder (left wheel) only the left loop has feedback; the right wheel runs feed-forward (open loop) until D8 (right-wheel encoder) is resolved.
+> ⚠️ With a single encoder (front-left wheel) only the left loop has feedback; the right wheel runs feed-forward (open loop) until D8 (right-wheel encoder) is resolved.
 
 #### ESP32 #2 — Steering + IMU `[FIRMWARE — UPGRADED]`
 
 | Direction | Topic | Type | Notes |
 |-----------|-------|------|-------|
-| Sub | `/target_angle` | `Float32` | Desired caster angle in degrees |
+| Sub | `/target_front_angle` | `Float32` | Desired angle `α` in degrees of **both front wheels** (one steering motor, chain/sprocket) — **new in 2027, board allocation assumed, see D23** |
+| Sub | `/target_angle` | `Float32` | Desired angle `β` in degrees of the **rear** (steered, undriven) wheel |
 | Pub | `/imu/data` | `sensor_msgs/Imu` | Orientation + angular velocity + acceleration, with covariances (BNO055: fused 9-DOF · MPU-6050: 6-DOF, yaw drifts) |
 
-Hardware: Stepper motor (TB6600) + MPU-6050 or BNO055 IMU
+Hardware: 2× stepper motor (TB6600) — one steers the rear wheel, one steers both front wheels through a chain/sprocket — + MPU-6050 or BNO055 IMU
 **2027 change:** Replaces fragile phone-IMU UDP protocol entirely. Uses proper `sensor_msgs/Imu` with real covariance matrices.
-> ⚠️ A stepper has no position feedback: it needs a home switch (or potentiometer) at boot so `/target_angle` is absolute (D16). MPU-6050 has no magnetometer, so yaw drifts — BNO055 recommended (D19).
+> ⚠️ A stepper has no position feedback: it needs a home switch (or potentiometer) at boot so `/target_angle` and `/target_front_angle` are absolute (D16). MPU-6050 has no magnetometer, so yaw drifts — BNO055 recommended (D19).
 
 #### ESP32 #3 — Lift + Lights `[FIRMWARE]`
 
@@ -340,7 +342,7 @@ Both are started by `hardware.launch.py`. In simulation the same topics come fro
 
 #### `odom_covariance_fix` `[P1 — SIMULATION ONLY]`
 
-**Purpose:** Gazebo DiffDrive outputs zero covariance matrices — EKF cannot invert them. Relay node that injects valid diagonal covariances.
+**Purpose:** Gazebo's `OdometryPublisher` outputs zero covariance matrices — EKF cannot invert them. Relay node that injects valid diagonal covariances.
 
 | Direction | Topic | Type |
 |-----------|-------|------|
@@ -349,7 +351,7 @@ Both are started by `hardware.launch.py`. In simulation the same topics come fro
 | Pub | `/odom_fixed` | `Odometry` |
 | Pub | `/imu_fixed` | `Imu` |
 
-Only launched in simulation (`sim:=true`). In simulation `odom_fusion_node` is **not** launched — Gazebo DiffDrive is the `/odom` source.
+Only launched in simulation (`sim:=true`). In simulation `odom_fusion_node` is **not** launched — Gazebo's `OdometryPublisher` (ground-truth pose, no wheel slip) is the `/odom` source.
 
 ---
 
@@ -390,14 +392,14 @@ Only launched in simulation (`sim:=true`). In simulation `odom_fusion_node` is *
 
 | Direction | Topic | Type | Notes |
 |-----------|-------|------|-------|
-| Sub | `/joint_states` | `JointState` | Caster / fork joints (sim: from the bridge · hardware: open, see D21) |
+| Sub | `/joint_states` | `JointState` | Steering / drive-wheel / fork joints (sim: from the bridge · hardware: open, see D21) |
 | Pub | `/tf_static`, `/tf` | `TFMessage` | `base_footprint → base_link → laser_link / camera_link / imu_link / fork_link` |
 
 **Full TF tree — exactly one publisher per edge:**
 ```
 map ──(SLAM Toolbox)──► odom ──(EKF)──► base_footprint ──(robot_state_publisher)──► base_link ──► sensors
 ```
-Gazebo's DiffDrive TF publishing **must be disabled**, otherwise two nodes publish `odom → base_footprint`.
+Gazebo's odometry-plugin TF publishing **must be disabled**, otherwise two nodes publish `odom → base_footprint`.
 **Clock:** every node runs with `use_sim_time` and, in sim, `/clock` must be bridged from Gazebo (§6).
 
 ---
@@ -406,33 +408,54 @@ Gazebo's DiffDrive TF publishing **must be disabled**, otherwise two nodes publi
 
 #### `base_controller` `[P1]`
 
-**Purpose:** Convert a velocity command into **left/right wheel speed setpoints** and a **front caster angle**. Single owner of ESP32 #1 (driving) and ESP32 #2 (steering), and the single **arbiter** of who may command motion. Unified node for sim and hardware.
+**Purpose:** Convert a body velocity command into **front-left / front-right drive-wheel speeds**, a **front steering angle `α`** (both front wheels together) and a **rear steering angle `β`**. Single owner of ESP32 #1 (driving) and ESP32 #2 (steering), and the single **arbiter** of who may command motion. Unified node for sim and hardware.
 
-**Robot geometry:** differential rear drive (2 DC motors) + one front caster steered by a stepper.
+**Robot geometry (confirmed by the team lead):** three-wheeled forklift, **forks at the front**.
+- **2 front drive wheels**, one on each side of the forks, each with its own DC motor (forward / reverse). They are the only driven wheels.
+- **1 front steering motor** turns **both** front wheels together through a chain/sprocket, so they are always **parallel at the same angle `α`** (`α = 0` = straight ahead, positive = wheels point left).
+- **1 rear wheel** on the centreline at the back, **steered by its own motor** (angle `β`) and **not driven** — it rolls freely.
+- **1 lift motor** (ESP32 #3) raises the forks.
+
+Commands `(v, ω)` are expressed at the **midpoint of the front drive axle**, which must be the origin of `base_footprint` (the URDF must place it there). `W` = `track_width` between the front wheels; `L` = `wheelbase_L` from the front-axle midpoint to the rear wheel (positive; the rear wheel is **behind** the axle).
 
 | Direction | Topic | Type | Condition |
 |-----------|-------|------|-----------|
-| Sub | `/manual_cmd_vel` | `Twist` | MANUAL mode — highest priority |
+| Sub | `/manual_cmd_vel` | `Twist` | MANUAL mode — highest priority (`linear.y` is used only in CRAB mode) |
 | Sub | `/fork_insertion/cmd_vel` | `Twist` | Fine approach (APPROACH → INSERT_FORKS) |
 | Sub | `/charging_dock/cmd_vel` | `Twist` | Final dock approach |
 | Sub | `/cmd_vel` | `Twist` | AUTO mode (Nav2) — lowest priority |
 | Sub | `/gui/mode` | `String` | MANUAL / AUTO selector |
 | Sub | `/e_stop` | `Bool` | Latched stop |
-| Pub | `/cmd_vel_out` | `Twist` | Arbitrated command, both modes (sim: Gazebo DiffDrive input) |
-| Pub | `/target_angle` | `Float32` (degrees) | `sim:=false` (hardware) |
-| Pub | `/target_speed_left` | `Float32` (m/s) | `sim:=false` (hardware) |
-| Pub | `/target_speed_right` | `Float32` (m/s) | `sim:=false` (hardware) |
-| Pub | `/castor_cmd_pos` | `Float64` (radians) | `sim:=true` (simulation; the topic keeps the 2026 spelling "castor") |
+| Sub | `/manual_joint_cmd` | `Float32MultiArray` | JOINT mode only (MANUAL): `[alpha_deg, beta_deg, v_left_mps, v_right_mps]` |
+| Sub | `/drive_mode` | `String` | `NORMAL` (default), `CRAB` or `JOINT`; CRAB / JOINT are honoured only in MANUAL (see below) |
+| Pub | `/target_front_angle` | `Float32` (degrees) | `sim:=false` (hardware) — `α`, both front wheels |
+| Pub | `/target_angle` | `Float32` (degrees) | `sim:=false` (hardware) — `β`, **rear** wheel |
+| Pub | `/target_speed_left` | `Float32` (m/s) | `sim:=false` (hardware) — front-left wheel |
+| Pub | `/target_speed_right` | `Float32` (m/s) | `sim:=false` (hardware) — front-right wheel |
+| Pub | `/front_steer_cmd_pos` | `Float64` (radians) | `sim:=true` — `α`, both front steering joints |
+| Pub | `/castor_cmd_pos` | `Float64` (radians) | `sim:=true` — `β`, **rear** steering joint (the topic keeps the 2026 spelling "castor") |
+| Pub | `/front_left_wheel_cmd_vel` | `Float64` (rad/s) | `sim:=true` — front-left wheel angular velocity |
+| Pub | `/front_right_wheel_cmd_vel` | `Float64` (rad/s) | `sim:=true` — front-right wheel angular velocity |
 
-**Arbitration (evaluated every cycle):** `/e_stop` → output zero · MANUAL → only `/manual_cmd_vel` · AUTO → `/fork_insertion/cmd_vel` or `/charging_dock/cmd_vel` if received in the last 0.2 s, otherwise `/cmd_vel`.
+**Arbitration (evaluated every cycle):** `/e_stop` → output zero · MANUAL → only `/manual_cmd_vel` (or `/manual_joint_cmd` in JOINT mode) · AUTO → `/fork_insertion/cmd_vel` or `/charging_dock/cmd_vel` if received in the last 0.2 s, otherwise `/cmd_vel`.
 **Startup default:** until the first `/gui/mode` sample arrives, mode = MANUAL — the robot never starts moving autonomously on its own.
-**Command timeout:** if the selected source is silent for `cmd_timeout` (0.5 s) output zero. The ESP32s apply the same timeout to `/target_speed_*` / `/target_angle`.
-**Wheel speeds (differential):** `v_left = v − ω·W/2`, `v_right = v + ω·W/2`, `W` = `track_width` (m, **measure on the robot**).
-**Caster angle:** `angle = caster_direction · sgn(v)·atan2(ω·L, |v|)` (sgn(0)=+1), clamped ±80°, `L` = 0.5 m axle→caster. The `|v|`/`sgn` form keeps the angle correct when reversing.
-**Sign convention (REP-103):** `ω > 0` = counter-clockwise (left turn) → positive angle = caster points left. The Gazebo caster joint (axis +z) uses this convention, so `caster_direction = +1` in sim. On hardware, verify that a positive `/target_angle` turns the caster left; if the stepper is wired the other way set `caster_direction = −1` — fix it in this param, never in firmware.
+**Command timeout:** if the selected source is silent for `cmd_timeout` (0.5 s) output zero. The ESP32s apply the same timeout to `/target_speed_*` / `/target_angle` / `/target_front_angle`.
+**Why several modes:** two parallel front wheels steered together cannot rotate the body when `α ≠ 0` (their axles never intersect), so rotation exists only with `α = 0`, and translation in an arbitrary direction exists only with all three wheels parallel. `JOINT` is a commissioning / test mode that moves each actuator directly.
+
+| Mode | `α` (front) | `β` (rear) | Uses | Who may use it |
+|------|-------------|------------|------|----------------|
+| `NORMAL` | held at 0 | follows the turn (formula below) | `v`, `ω` (`linear.y` ignored) — differential drive of the front pair | everyone; **the only mode Nav2 and the autonomy nodes use** |
+| `CRAB` | `atan(vy/vx)`, range ±90° | `β = α` | `vx`, `vy`, **`ω` forced to 0** — sideways / diagonal translation | MANUAL only (dashboard) |
+| `JOINT` | commanded directly | commanded directly | `/manual_joint_cmd` — `α`, `β`, `v_left`, `v_right` set independently | MANUAL only (dashboard jog panel) |
+
+**JOINT:** `base_controller` clamps `α` to ±`max_front_angle_deg`, `β` to ±`max_rear_angle_deg` and the speeds to `max_wheel_speed`, then outputs them unchanged (no kinematic coupling — the operator is responsible for a sensible combination). On `cmd_timeout` the **speeds go to zero and the angles hold** (a stepper cannot "go to zero"). Entering or leaving JOINT: stop first, then recentre `α = β = 0` before NORMAL.
+**NORMAL wheel speeds:** `v_left = v − ω·W/2`, `v_right = v + ω·W/2`, `W` = `track_width` (m, from the CAD, verify on the robot).
+**CRAB:** `s = hypot(vx, vy)` with the sign of `vx` (of `vy` if `vx = 0`); `α = β = atan2(vy, vx)` folded into ±90° (add / subtract 180° and negate `s`); both front wheels run at `s`. Output zero speed for `steer_settle_time` after `α` or `β` changes by more than `steer_deadband_deg` (steppers have no feedback, D16). To leave CRAB: stop, steer `α = β = 0`, wait the settle time, then switch to NORMAL. An `/e_stop` or a switch to AUTO forces NORMAL (stop, then recentre as above). `/drive_mode = CRAB` received outside MANUAL is ignored.
+**NORMAL rear angle:** `β = rear_direction · atan2(−ω·L·sgn(v), |v|)` (sgn(0)=+1), clamped ±`max_rear_angle_deg`, `L` = `wheelbase_L` (sim assumption 0.5 m — **measure on the robot**). The rear wheel sits behind the axle, so for a left turn (`ω > 0`, forward) it swings **right** (`β < 0`). The `|v|`/`sgn` form keeps `β` correct when reversing. In-place rotation (`v = 0`) asks for `|β| = 90°` — see D16 for the clamp.
+**Sign convention (REP-103):** `ω > 0` = counter-clockwise (left turn); for both `α` and `β`, a positive angle = the wheel points left (rotation about +z). The Gazebo steering joints (axis +z) use this convention, so `front_direction = rear_direction = +1` in sim. On hardware, verify that a positive `/target_front_angle` and a positive `/target_angle` turn their wheels left; if a stepper is wired the other way set that direction param to −1 — fix it in the param, never in firmware.
 **No PID on the Jetson** — ESP32 #1 closes the speed loop on its encoder and outputs PWM itself. `/wheel_velocity` feeds odometry only, never `base_controller`.
-**Simulation:** hardware topics are not published. Gazebo DiffDrive consumes `/cmd_vel_out` (**never** raw `/cmd_vel`, or manual / fork / dock commands would bypass arbitration) and the caster follows `/castor_cmd_pos`.
-**Params:** `track_width`, `wheelbase_L`, `max_angle_deg`, `caster_direction` (+1 / −1), `cmd_timeout`, `sim` (selects sim vs hardware outputs; independent of the `use_sim_time` clock flag).
+**Simulation:** hardware topics are not published. There is **no DiffDrive plugin** (it cannot model steered wheels). Instead Gazebo consumes the per-joint commands `/front_steer_cmd_pos`, `/castor_cmd_pos`, `/front_left_wheel_cmd_vel`, `/front_right_wheel_cmd_vel` (wheel rad/s = speed / `wheel_radius`), published only by `base_controller` after arbitration — raw `/cmd_vel` is **never** read, or manual / fork / dock commands would bypass arbitration. Odometry comes from Gazebo's `OdometryPublisher` (§6).
+**Params:** `track_width`, `wheelbase_L`, `wheel_radius` (sim), `max_front_angle_deg` (90), `max_rear_angle_deg`, `max_wheel_speed`, `front_direction`, `rear_direction` (+1 / −1), `steer_settle_time`, `steer_deadband_deg`, `cmd_timeout`, `sim` (selects sim vs hardware outputs; independent of the `use_sim_time` clock flag).
 
 ---
 
@@ -451,9 +474,9 @@ Gazebo's DiffDrive TF publishing **must be disabled**, otherwise two nodes publi
 
 **Global planner:** NavFn (default) or SmacPlanner2D (`planner_server`).
 **Local controller (path tracker):** **Regulated Pure Pursuit** (`nav2_regulated_pure_pursuit_controller`) recommended for aisle driving; DWB is the 2026 baseline; MPPI to be benchmarked (D6). Speed: `max_vel_x: 1.0 m/s`, `max_vel_theta: 1.5 rad/s`.
-**Boundary with `base_controller`:** the Nav2 controller outputs only body velocity `(v, ω)` on `/cmd_vel` — it knows nothing about wheels or the caster. `base_controller` arbitrates and converts that to wheel speeds + caster angle. If Nav2's velocity smoother / collision monitor are enabled, their final output must be remapped to `/cmd_vel`.
+**Boundary with `base_controller`:** the Nav2 controller outputs only body velocity `(v, ω)` on `/cmd_vel` — it knows nothing about wheels or steering. `base_controller` arbitrates and converts that to wheel speeds + the front and rear steering angles. If Nav2's velocity smoother / collision monitor are enabled, their final output must be remapped to `/cmd_vel`.
 
-**Pose source:** TF (`map → odom → base_footprint`); `/odometry/filtered` supplies velocity only. Nav2 treats the robot as differential-drive; the caster is `base_controller`'s job.
+**Pose source:** TF (`map → odom → base_footprint`); `/odometry/filtered` supplies velocity only. Nav2 treats the robot as differential-drive (valid in NORMAL mode); both steering angles are `base_controller`'s job. Nav2 never uses CRAB.
 
 ---
 
@@ -679,7 +702,8 @@ Phase 2: reads real BMS via I2C.
 |---------|----------|-----------|---------|
 | Static | `GET /` | server → browser | `index.html`, `css/`, `js/` |
 | WebSocket | `/ws` | server → browser | JSON `{"type": ..., "data": ...}`: `snapshot`, `status`, `pose`, `plan`, `battery`, `mission_status`, `map_updated`, `health`, `log`, `wms` |
-| WebSocket | `/ws` | browser → server | `{"type": "joy", "v": m/s, "w": rad/s}` → `/manual_cmd_vel` |
+| WebSocket | `/ws` | browser → server | `{"type": "joy", "v": m/s, "w": rad/s, "vy": m/s}` → `/manual_cmd_vel` (`vy` honoured only in CRAB) |
+| WebSocket | `/ws` | browser → server | `{"type": "joint", "alpha": deg, "beta": deg, "vl": m/s, "vr": m/s}` → `/manual_joint_cmd` (JOINT mode only, 10 Hz while a jog button is held) |
 | MJPEG | `GET /stream/camera` | server → browser | `multipart/x-mixed-replace` from `/camera/stream/compressed` |
 | MJPEG | `GET /stream/debug` | server → browser | `multipart/x-mixed-replace` from `/pallet/debug_image` (YOLO overlay) |
 | REST | `GET /api/map.png`, `GET /api/map/meta` | server → browser | Latest `/map` as PNG + resolution / origin / size |
@@ -689,6 +713,7 @@ Phase 2: reads real BMS via I2C.
 | REST | `POST /api/mode` `{"mode": "MANUAL"\|"AUTO"}` | browser → ROS | `/gui/mode` (AUTO rejected while e-stop is latched) |
 | REST | `POST /api/lift` `{"cmd": 0\|1\|2}` | browser → ROS | `/lift_cmd` — MANUAL only |
 | REST | `POST /api/lights` `{"relays": [0,1,0,0]}` | browser → ROS | `/lights_cmd` — MANUAL only |
+| REST | `POST /api/drive_mode` `{"mode": "NORMAL"\|"CRAB"\|"JOINT"}` | browser → ROS | `/drive_mode` — MANUAL only (§4.3) |
 | REST | `POST /api/mission` `{"pickup", "dropoff", "priority"}` | browser → ROS | `/wms/manual_mission` |
 
 **Server-side throttling:** `pose` / speed 10 Hz · `status` / `battery` 2 Hz · map ≤ 1 Hz (server renders the `OccupancyGrid` to PNG, pushes `map_updated`, browser re-fetches `/api/map.png?v=<stamp>`) · logs batched every 200 ms.
@@ -698,7 +723,7 @@ Phase 2: reads real BMS via I2C.
 - **Threading:** the `rclpy` executor spins in a background thread started in FastAPI's `lifespan`; ROS callbacks hand data to asyncio with `loop.call_soon_threadsafe(...)`. Never spin ROS on the event-loop thread.
 - **One worker only:** run uvicorn with a single worker — every extra worker would create a duplicate ROS node with duplicate publishers.
 - **Joystick deadman:** the browser sends `joy` at 10 Hz while a key / button is held and `v = w = 0` on release. `dashboard_server` publishes zero if the last `joy` is older than 0.3 s or the WebSocket closes; `base_controller`'s 0.5 s `cmd_timeout` is the second layer.
-- **Single-writer rule enforced server-side:** `joy`, `/api/lift` and `/api/lights` are rejected (HTTP 409) unless mode is MANUAL.
+- **Single-writer rule enforced server-side:** `joy`, `joint`, `/api/lift`, `/api/lights` and `/api/drive_mode` are rejected (HTTP 409) unless mode is MANUAL.
 - **Reload-safe:** on every WebSocket (re)connect the server first sends a `snapshot` (mode, e-stop, last status, mission lists, last 500 log lines), so a page reload or Wi-Fi drop loses nothing. The browser auto-reconnects and shows a `WS: LIVE / LOST` badge.
 - **Not a safety device:** the browser E-STOP travels over Wi-Fi — a hardware e-stop that cuts motor power is still required (D15).
 
@@ -726,12 +751,16 @@ Phase 2: reads real BMS via I2C.
 ├──────────────────────────────────────────────────────────────────┤
 │  MANUAL JOYSTICK — visible only in MANUAL mode (keys: W A S D)   │
 │  [↑][↓][←][→]   Lift: [UP][STOP][DOWN]   Lights: [ON][OFF]       │
+│  Drive mode: [NORMAL] [CRAB] [JOINT]   (CRAB/JOINT: MANUAL only) │
+│  JOINT: Front α [◄][CENTRE][►]    Rear β [◄][CENTRE][►]          │
+│  Left wheel [FWD][BWD]   Right wheel [FWD][BWD]   [STOP ALL]     │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
 **Buttons:** [E-STOP] → `/e_stop = true` + `/gui/mode = MANUAL` · [RESET E-STOP] → `/e_stop = false` · [RESUME AUTO] → `/gui/mode = AUTO` (disabled while e-stopped) · [MANUAL MODE] → `/gui/mode = MANUAL`. See §4.5 for the full recovery flow.
-**Subscribes (via `dashboard_server`):** `/map`, TF `map → base_footprint` (robot icon), `/odometry/filtered` (actual speed), `/plan`, `/robot/state`, `/fork_height`, `/battery/state`, `/wms/mission_status`, `/camera/stream/compressed`, `/pallet/debug_image`
-**Publishes (via `dashboard_server`):** `/e_stop`, `/gui/mode`, `/manual_cmd_vel`, `/lift_cmd`, `/lights_cmd`, `/wms/manual_mission`
+**Subscribes (via `dashboard_server`):** `/map`, TF `map → base_footprint` (robot icon), `/odometry/filtered` (actual speed), `/plan`, `/robot/state`, `/fork_height`, `/battery/state`, `/wms/mission_status`, `/camera/stream/compressed`, `/pallet/debug_image`, `/joint_states` (jog panel readout)
+**Publishes (via `dashboard_server`):** `/e_stop`, `/gui/mode`, `/manual_cmd_vel`, `/manual_joint_cmd`, `/drive_mode`, `/lift_cmd`, `/lights_cmd`, `/wms/manual_mission`
+**Manual drive:** in NORMAL the joystick sends `v` and `w`. The `[NORMAL | CRAB | JOINT]` toggle (MANUAL only, `POST /api/drive_mode`) switches mode. In CRAB the joystick sends `v` (forward) and `vy` (sideways) and `w` is ignored. In JOINT the jog panel is shown: the front `α` and rear `β` [◄] / [►] buttons step the angle by 5° (hold = repeat), [CENTRE] sets 0°, and each front wheel has [FWD] / [BWD] (fixed jog speed, e.g. 0.2 m/s, only while held); [STOP ALL] zeroes both wheels. Lift [UP] / [STOP] / [DOWN] and the lights work in every mode. The server refuses CRAB / JOINT unless the mode is MANUAL and the e-stop is clear, and the panel shows the live `α`, `β` and wheel speeds from `/joint_states`.
 **Video:** MJPEG `/stream/camera` (raw) or `/stream/debug` (YOLO overlay), toggled in the browser — front camera only
 
 ---
@@ -806,8 +835,11 @@ Phase 2: reads real BMS via I2C.
 | Front RGB | `CameraSensor` | `/camera/image_raw` |
 | Front Depth | `DepthCameraSensor` | `/camera/depth/image_raw` |
 | IMU | `ImuSensor` | `/imu` (raw → `odom_covariance_fix` → `/imu_fixed`) |
-| Wheel odometry | `gz::sim::systems::DiffDrive` (TF publishing **disabled** — the EKF owns `odom → base_footprint`) | `/odom` (output), `/cmd_vel_out` (input — **not** `/cmd_vel`) |
-| Caster joint | Revolute + `JointPositionController` | `/castor_cmd_pos` (input) |
+| Odometry | `gz::sim::systems::OdometryPublisher` (ground-truth pose; TF publishing **disabled** — the EKF owns `odom → base_footprint`). **No DiffDrive** — it cannot model steered wheels | `/odom` (output) |
+| Front steering joints (`front_left_steer_joint`, `front_right_steer_joint`) | Revolute (axis +z) + one `JointPositionController` each, both on the **same** gz topic, so they stay parallel like the real chain | `/front_steer_cmd_pos` (input) |
+| Rear steering joint (`caster_joint`) | Revolute (axis +z) + `JointPositionController` | `/castor_cmd_pos` (input) |
+| Front drive wheels (`front_left_wheel_joint`, `front_right_wheel_joint`) | Continuous + velocity `JointController` | `/front_left_wheel_cmd_vel`, `/front_right_wheel_cmd_vel` (input, rad/s) |
+| Rear wheel (`caster_wheel_joint`) | Continuous, **passive** (no plugin, low friction) — it must roll freely | — |
 | Fork joint | Prismatic + JointController | `/fork_cmd_vel` (input), `/joint_states` (output) — wrapped by `sim_fork_adapter` |
 | Simulation clock | Gazebo | `/clock` (**required** for `use_sim_time:=true`) |
 
@@ -856,10 +888,22 @@ Phase 2: reads real BMS via I2C.
   gz_type_name:   "gz.msgs.Odometry"
   direction: GZ_TO_ROS
 
-- ros_topic_name: "/cmd_vel_out"              # arbitrated output of base_controller
-  gz_topic_name:  "/model/wafl/cmd_vel"
-  ros_type_name:  "geometry_msgs/msg/Twist"
-  gz_type_name:   "gz.msgs.Twist"
+- ros_topic_name: "/front_steer_cmd_pos"      # both front steering joints subscribe to this one gz topic
+  gz_topic_name:  "/model/wafl/front_steer/cmd_pos"          # set <topic> explicitly in both plugins
+  ros_type_name:  "std_msgs/msg/Float64"
+  gz_type_name:   "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/front_left_wheel_cmd_vel"
+  gz_topic_name:  "/model/wafl/joint/front_left_wheel_joint/cmd_vel"
+  ros_type_name:  "std_msgs/msg/Float64"
+  gz_type_name:   "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/front_right_wheel_cmd_vel"
+  gz_topic_name:  "/model/wafl/joint/front_right_wheel_joint/cmd_vel"
+  ros_type_name:  "std_msgs/msg/Float64"
+  gz_type_name:   "gz.msgs.Double"
   direction: ROS_TO_GZ
 
 - ros_topic_name: "/castor_cmd_pos"
@@ -928,11 +972,16 @@ ros2 launch wafl_bringup hardware.launch.py use_sim_time:=false
 | `/map` | `OccupancyGrid` | SLAM Toolbox | Nav2, GUI Tab1 |
 | `/cmd_vel` | `Twist` | Nav2 | `base_controller` |
 | `/manual_cmd_vel` | `Twist` | GUI Tab1 | `base_controller` (manual mode) |
+| `/manual_joint_cmd` | `Float32MultiArray` | GUI Tab1 | `base_controller` (JOINT mode only) |
 | `/fork_insertion/cmd_vel` | `Twist` | `fork_insertion_node` | `base_controller` |
 | `/charging_dock/cmd_vel` | `Twist` | `charging_dock_node` | `base_controller` |
-| `/cmd_vel_out` | `Twist` | `base_controller` | Gazebo DiffDrive (sim only) |
-| `/target_angle` | `Float32` | `base_controller` | ESP32 #2 |
-| `/castor_cmd_pos` | `Float64` | `base_controller` | Gazebo (sim only) |
+| `/drive_mode` | `String` (latched) | GUI Tab1 | `base_controller` |
+| `/target_front_angle` | `Float32` | `base_controller` | ESP32 #2 (front wheels, `α`) |
+| `/target_angle` | `Float32` | `base_controller` | ESP32 #2 (rear wheel, `β`) |
+| `/front_steer_cmd_pos` | `Float64` | `base_controller` | Gazebo (sim only, both front steering joints) |
+| `/castor_cmd_pos` | `Float64` | `base_controller` | Gazebo (sim only, rear steering joint) |
+| `/front_left_wheel_cmd_vel` | `Float64` | `base_controller` | Gazebo (sim only) |
+| `/front_right_wheel_cmd_vel` | `Float64` | `base_controller` | Gazebo (sim only) |
 | `/plan` | `Path` | Nav2 | GUI Tab1 |
 | `/target_speed_left` | `Float32` | `base_controller` | ESP32 #1 |
 | `/target_speed_right` | `Float32` | `base_controller` | ESP32 #1 |
@@ -940,7 +989,7 @@ ros2 launch wafl_bringup hardware.launch.py use_sim_time:=false
 | `/lights_cmd` | `Int32MultiArray` | `mission_manager_node`, GUI Tab1 | ESP32 #3 |
 | `/fork_height` | `Float32` | ESP32 #3 / `sim_fork_adapter` | `fork_insertion_node`, `mission_manager_node`, GUI Tab1, GUI Tab2 (heartbeat) |
 | `/fork_cmd_vel` | `Float64` | `sim_fork_adapter` | Gazebo fork joint (sim only) |
-| `/joint_states` | `JointState` | Gazebo via bridge (sim) · hardware: open (D21) | `robot_state_publisher`, `sim_fork_adapter` |
+| `/joint_states` | `JointState` | Gazebo via bridge (sim) · hardware: open (D21) | `robot_state_publisher`, `sim_fork_adapter`, GUI Tab1 (jog readout) |
 | `/camera/image_raw` | `Image` | Kinect / Gazebo | `pallet_pose_node`, `pallet_front_angle_node`, `camera_stream_node` |
 | `/camera/depth/image_raw` | `Image` | Kinect / Gazebo | `pallet_front_angle_node` |
 | `/camera/stream/compressed` | `CompressedImage` | `camera_stream_node` | GUI Tab1 (MJPEG `/stream/camera`) |
@@ -1054,7 +1103,7 @@ float32 progress_percent
 | D5 | WMS Phase 1 server | ✅ DECIDED | FastAPI stub | — |
 | D6 | Nav2 local planner | ⬜ OPEN | Leaning **Regulated Pure Pursuit** (tracks straight aisles and curves smoothly without DWB jitter, §4.3); DWB = 2026 baseline | RPP can't handle dynamic obstacles well enough in sim → benchmark MPPI |
 | D7 | Charging dock detection | ✅ DECIDED | ArUco ID=99 (reuses pipeline) | Bad lighting → IR beacon |
-| D8 | Dual encoders | ⬜ OPEN | Single encoder + IMU yaw | Poor turns → add right-wheel encoder |
+| D8 | Dual encoders | ⬜ OPEN | Single encoder + IMU yaw. Note: the encoder is on the front-LEFT wheel, so `/wheel_velocity` is `v_left`, not the body speed — `odom_fusion_node` must use `v ≈ v_left + ω·W/2` (ω from the IMU) | Poor turns → add right-wheel encoder |
 | D9 | Fork height sensing | ⬜ OPEN | Potentiometer | — |
 | D10 | Load cell | ⬜ OPEN | Skipped | Needed for CONFIRM state reliability |
 | D11 | Camera streaming | ✅ DECIDED | `camera_stream_node` (JPEG, 15 fps) → `dashboard_server` → MJPEG over HTTP (`<img>` tag) | Latency / Wi-Fi bandwidth too high → WebRTC |
@@ -1062,13 +1111,14 @@ float32 progress_percent
 | D13 | Who owns `DROP` | ⬜ OPEN | Listed in both `mission_manager` and `fork_insertion_node` state machines | Recommend `InsertForks.action` goal gets an `operation` field (PICKUP \| DROP); `mission_manager` owns NAVIGATE_TO_DROP only |
 | D14 | Unused interfaces | ⬜ OPEN | `Alarm.msg` and `SetMission.srv` have no publisher / server | Wire `/alarms` + a service, or delete them |
 | D15 | Safety chain | ⬜ OPEN | Software: `/e_stop` reaches `base_controller`, `fork_insertion_node`, `charging_dock_node`, 0.5 s command timeout. **Hardware e-stop that cuts motor power is required** — the GUI button goes over Wi-Fi | Not optional for a forklift |
-| D16 | Caster homing / limits | ⬜ OPEN | Stepper (TB6600) has no position feedback → add home switch or potentiometer. ±80° clamp vs 90° needed for in-place rotation | Constrain Nav2 rotation behaviour or raise clamp |
+| D16 | Steering homing / limits | ⬜ OPEN | Both steppers (front pair and rear wheel) have no position feedback → add a home switch or potentiometer to each. Rear: ±80° clamp vs 90° needed for in-place rotation. Front: CRAB needs ±90° — the mechanism can turn 90° (confirmed), clamp to the real mechanical stops | Constrain Nav2 rotation behaviour, raise the clamp, or limit CRAB to the real range |
 | D17 | GUI robot pose source | ✅ DECIDED | TF `map → base_footprint` (`/odometry/filtered` is odom-frame and drifts against the map) | — |
 | D18 | Averaged pallet topics | ✅ DECIDED | Averaging is internal; only the averaged values are published on the topics in §7 (no `_avg` variants) | — |
 | D19 | IMU part | ⬜ OPEN | MPU-6050 is 6-DOF (no magnetometer → yaw drifts); BNO055 gives fused orientation | Prefer BNO055 |
 | D20 | Manual mode vs Nav2 lifecycle | ⬜ OPEN | Proposed (used in §4.5): cancel the active goal and let `base_controller` arbitrate. Deactivating Nav2 lifecycle nodes is rejected (slow, costmaps restart) | Confirm in sim; revisit only if goal cancel proves unreliable |
-| D21 | Hardware `/joint_states` | ⬜ OPEN | Nothing publishes it on hardware, so `robot_state_publisher` has no caster / fork frames | `base_controller` publishes the caster joint (last `/target_angle`) + a fork-height → joint adapter, or make those joints fixed in the hardware URDF |
+| D21 | Hardware `/joint_states` | ⬜ OPEN | Nothing publishes it on hardware, so `robot_state_publisher` has no steering / fork frames | `base_controller` publishes the steering joints (last `/target_front_angle`, `/target_angle`) + a fork-height → joint adapter, or make those joints fixed in the hardware URDF |
 | D22 | Dashboard access & control | ⬜ OPEN | Phase 1: LAN only, no login; every open browser can send commands | Before hardware demos: one "controller" browser at a time (others view-only) + a shared access token |
+| D23 | Front-pair steering kinematics | ⬜ OPEN (proposed in §4.3) | Modes NORMAL (`α = 0`, differential + rear follows), MANUAL-only CRAB (`α = β`) and JOINT (direct jog). **Confirmed:** two independent front drive motors; the front pair can turn ±90°; `track_width`, `wheelbase_L`, wheel radius come from the CAD. **Still open:** (1) which ESP32 / board drives the front steering motor — *ask the low-level team*; until answered, `/target_front_angle` on ESP32 #2 is a placeholder; (2) hardware odometry does **not** model CRAB (it assumes forward motion only, so the map position would drift when crabbing; sim is unaffected) — use CRAB for short manual moves only; (3) the sim files (`ros_gz_bridge.yaml`, `generate_assets.py`, `wafl_gz_plugins.xacro`) and the new URDF must follow the joint names in §6 | Mechanism differs → revise §4.3 |
 
 ### Research Links
 
@@ -1097,9 +1147,10 @@ float32 progress_percent
 | LiDAR | `GpuLidarSensor` | Real RPLiDAR A2M8 |
 | Camera | `CameraSensor` + `DepthCameraSensor` | Kinect v1 (front only) |
 | IMU | `ImuSensor` plugin | MPU-6050 / BNO055 on ESP32 #2 |
-| Odometry | Gazebo DiffDrive → `odom_covariance_fix` → EKF | `encoder_velocity_node` + `odom_fusion_node` → EKF |
-| Caster | `/castor_cmd_pos` (Gazebo joint) | `/target_angle` → ESP32 #2 |
-| Driving | Gazebo DiffDrive plugin ← `/cmd_vel_out` | `/target_speed_left`, `/target_speed_right` → ESP32 #1 (PID on the ESP32) |
+| Odometry | Gazebo `OdometryPublisher` (ground truth) → `odom_covariance_fix` → EKF | `encoder_velocity_node` + `odom_fusion_node` → EKF |
+| Front steering (both wheels, `α`) | `/front_steer_cmd_pos` (two Gazebo joints, same command) | `/target_front_angle` → ESP32 #2 |
+| Rear steering (`β`) | `/castor_cmd_pos` (Gazebo joint) | `/target_angle` → ESP32 #2 |
+| Driving (front wheels only) | Gazebo joint velocity controllers ← `/front_left_wheel_cmd_vel`, `/front_right_wheel_cmd_vel` | `/target_speed_left`, `/target_speed_right` → ESP32 #1 (PID on the ESP32) |
 | Lift | Gazebo prismatic joint via `sim_fork_adapter` | `/lift_cmd` → ESP32 #3 |
 | Fork height | `sim_fork_adapter` from joint state | Potentiometer or encoder (D9 open) → ESP32 #3 → `/fork_height` |
 | Clock | `/clock` from Gazebo bridge | System clock |
