@@ -38,7 +38,7 @@ def generate_launch_description():
         DeclareLaunchArgument('use_sim_time', default_value='true'),
         DeclareLaunchArgument('world', default_value=os.path.join(pkg_share, 'worlds', 'warehouse.world')),
         DeclareLaunchArgument('robot_xacro', default_value=os.path.join(
-            pkg_share, 'urdf', 'wafl_sim_robot.urdf.xacro')),
+            pkg_share, 'urdf', 'wafl_sim_bootstrap.urdf.xacro')),
         DeclareLaunchArgument('start_rsp', default_value='true'),
         DeclareLaunchArgument('bridge_config', default_value=os.path.join(
             pkg_share, 'config', 'ros_gz_bridge.yaml')),

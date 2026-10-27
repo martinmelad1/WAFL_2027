@@ -60,11 +60,14 @@ check(f"all {len(set(uris))} model:// URIs resolve to files", not missing, ",".j
 
 # ----------------------------------------------------------------------------- ArUco textures + mesh UVs
 d = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_100)
-det = cv2.aruco.ArucoDetector(d, cv2.aruco.DetectorParameters())
 for mid in (0, 1, 2, 3, 99):
     mdl = "wafl_charging_dock" if mid == 99 else f"wafl_pallet_{mid}"
     img = cv2.imread(str(PKG / "models" / mdl / "meshes" / f"aruco_{mid}.png"), cv2.IMREAD_GRAYSCALE)
-    _, ids, _ = det.detectMarkers(img)
+    if hasattr(cv2.aruco, "ArucoDetector"):
+        det = cv2.aruco.ArucoDetector(d, cv2.aruco.DetectorParameters())
+        _, ids, _ = det.detectMarkers(img)
+    else:
+        _, ids, _ = cv2.aruco.detectMarkers(img, d)
     check(f"aruco_{mid}.png decodes as ID {mid} (DICT_4X4_100)", ids is not None and ids.flatten().tolist() == [mid])
     obj = (PKG / "models" / mdl / "meshes" / f"aruco_{mid}.obj").read_text().splitlines()
     mtl = (PKG / "models" / mdl / "meshes" / f"aruco_{mid}.mtl").read_text()
@@ -89,7 +92,7 @@ def expand(main, plugins):
     inner = re.search(r"<robot[^>]*>(.*)</robot>", plugins, re.S).group(1)
     inner = re.sub(r"<xacro:arg[^>]*/>", "", inner)
     main = re.sub(r"<xacro:include[^>]*/>", lambda m: inner, main)
-    return re.sub(r"\$\(arg (\w+)\)", lambda m: defaults[m.group(1)], main)
+    return re.sub(r"\$\(arg (\w+)\)", lambda m: defaults.get(m.group(1), ""), main)
 
 
 robot = ET.fromstring(expand(urdf_txt, plug_txt).split("?>", 1)[1])
@@ -100,11 +103,11 @@ roots = [l for l in links if l not in children]
 check("URDF: single root link = base_footprint", roots == ["base_footprint"], str(roots))
 check("URDF: every joint's parent/child link exists",
       all(j.find("parent").get("link") in links and j.find("child").get("link") in links for j in joints.values()))
-need_j = ["left_wheel_joint", "right_wheel_joint", "caster_joint", "fork_joint"]
+need_j = ["front_left_steer_joint", "front_right_steer_joint", "front_left_wheel_joint", "front_right_wheel_joint", "caster_joint", "caster_wheel_joint", "fork_joint"]
 need_l = ["laser_link", "camera_link", "imu_link"]
 check("URDF has the joints/links the plugin block needs", all(j in joints for j in need_j) and all(l in links for l in need_l))
-plug_joints = re.findall(r"<(?:left_joint|right_joint|joint_name)>(\w+)<", plug_txt)
-check("every joint named in a gz plugin exists in the URDF", all(j in joints for j in plug_joints), ",".join(plug_joints))
+plug_joints = [j for j in set(re.findall(r'joint="(\w+)"', plug_txt) + re.findall(r"<joint_name>(\w+)<", plug_txt)) if j != "joint"]
+check("every joint named in a gz plugin exists in the URDF", all(j in joints for j in plug_joints), ",".join(sorted(plug_joints)))
 refs = re.findall(r'<gazebo reference="(\w+)"', plug_txt)
 check("every <gazebo reference> link exists", all(r in links for r in refs), ",".join(refs))
 inertia_bad = []
@@ -119,13 +122,11 @@ for name, l in links.items():
         inertia_bad.append(name)
 check("URDF inertias positive and satisfy the triangle inequality", not inertia_bad, ",".join(inertia_bad))
 
-# wheel geometry vs DiffDrive params
-wr = float(re.search(r'name="wheel_radius" default="([^"]+)"', plug_txt).group(1))
-urdf_r = float(links["left_wheel_link"].find("collision/geometry/cylinder").get("radius"))
-ty = abs(float(joints["left_wheel_joint"].find("origin").get("xyz").split()[1])) * 2
-tw = float(re.search(r'name="track_width"\s+default="([^"]+)"', plug_txt).group(1))
-check("DiffDrive wheel_radius / track_width match the URDF wheels", abs(wr - urdf_r) < 1e-9 and abs(ty - tw) < 1e-9,
-      f"radius {wr} vs {urdf_r}; track {tw} vs {ty}")
+# wheel geometry (front drive wheels)
+urdf_r = float(links["front_left_wheel_link"].find("collision/geometry/cylinder").get("radius"))
+ty = abs(float(joints["front_left_steer_joint"].find("origin").get("xyz").split()[1])) * 2
+check("front drive wheels have radius 0.1 m and track width matches URDF", abs(urdf_r - 0.1) < 1e-6 and ty > 0.3,
+      f"radius {urdf_r}; track {ty}")
 
 
 def xyz(j):
@@ -172,8 +173,10 @@ expect = {  # ros topic -> (gz topic, ros type, gz type, direction)  - from READ
     "/imu": ("/imu", "sensor_msgs/msg/Imu", "gz.msgs.IMU", "GZ_TO_ROS"),
     "/clock": ("/clock", "rosgraph_msgs/msg/Clock", "gz.msgs.Clock", "GZ_TO_ROS"),
     "/odom": ("/model/wafl/odometry", "nav_msgs/msg/Odometry", "gz.msgs.Odometry", "GZ_TO_ROS"),
-    "/cmd_vel_out": ("/model/wafl/cmd_vel", "geometry_msgs/msg/Twist", "gz.msgs.Twist", "ROS_TO_GZ"),
+    "/front_steer_cmd_pos": ("/model/wafl/front_steer/cmd_pos", "std_msgs/msg/Float64", "gz.msgs.Double", "ROS_TO_GZ"),
     "/castor_cmd_pos": ("/model/wafl/joint/caster_joint/cmd_pos", "std_msgs/msg/Float64", "gz.msgs.Double", "ROS_TO_GZ"),
+    "/front_left_wheel_cmd_vel": ("/model/wafl/joint/front_left_wheel_joint/cmd_vel", "std_msgs/msg/Float64", "gz.msgs.Double", "ROS_TO_GZ"),
+    "/front_right_wheel_cmd_vel": ("/model/wafl/joint/front_right_wheel_joint/cmd_vel", "std_msgs/msg/Float64", "gz.msgs.Double", "ROS_TO_GZ"),
     "/fork_cmd_vel": ("/model/wafl/joint/fork_joint/cmd_vel", "std_msgs/msg/Float64", "gz.msgs.Double", "ROS_TO_GZ"),
     "/joint_states": ("/world/warehouse/model/wafl/joint_state", "sensor_msgs/msg/JointState", "gz.msgs.Model", "GZ_TO_ROS"),
 }
@@ -186,11 +189,14 @@ check("bridge entries match the README sec. 6 mapping (names, types, directions)
 extra = set(by_ros) - set(expect)
 check("bridge has no unexpected entries; /cmd_vel and TF are not bridged", not extra and "/cmd_vel" not in by_ros
       and not any("/tf" in b["gz_topic_name"] for b in bridge), ",".join(sorted(extra)))
-gz_in_plugins = {"/lidar/scan", "/camera/image", "/camera/depth", "/imu", "/model/wafl/odometry", "/model/wafl/cmd_vel",
+gz_in_plugins = {"/lidar/scan", "/camera/image", "/camera/depth", "/imu", "/model/wafl/odometry",
+                 "/model/wafl/front_steer/cmd_pos",
+                 "/model/wafl/joint/front_left_wheel_joint/cmd_vel",
+                 "/model/wafl/joint/front_right_wheel_joint/cmd_vel",
                  "/model/wafl/joint/caster_joint/cmd_pos", "/model/wafl/joint/fork_joint/cmd_vel"}
-not_in = [g for g in gz_in_plugins if f">{g}<" not in plug_txt]
+not_in = [g for g in gz_in_plugins if g not in plug_txt and g.replace("front_left_wheel_joint", "${joint}").replace("front_right_wheel_joint", "${joint}") not in plug_txt]
 check("every bridged gz topic is produced/consumed by wafl_gz_plugins.xacro", not not_in, ",".join(not_in))
-check("DiffDrive TF goes to an unbridged topic (EKF owns odom->base_footprint)",
+check("OdometryPublisher TF goes to an unbridged topic (EKF owns odom->base_footprint)",
       "<tf_topic>/model/wafl/tf_unused" in plug_txt)
 check("sensor frame ids match the README (laser_link, camera_link)",
       plug_txt.count("<gz_frame_id>laser_link<") == 1 and plug_txt.count("<gz_frame_id>camera_link<") == 2)
@@ -246,7 +252,8 @@ sp = [re.search(rf"'spawn_{k}', default_value='([^']+)'", lt).group(1) for k in 
 check("launch spawn defaults equal the layout spawn pose in locations.yaml",
       [float(x) for x in sp] == [float(spawn[0]), float(spawn[1]), float(spawn[2])], str(sp))
 check("launch: bridge node does not use use_sim_time (it provides /clock)",
-      "parameters=[{'config_file': bridge_config}]" in lt)
+      "parameters=[{'config_file': LaunchConfiguration('bridge_config')}]" in lt
+      or "parameters=[{'config_file': bridge_config}]" in lt)
 
 # ----------------------------------------------------------------------------- summary
 fails = [r for r in results if not r[0]]

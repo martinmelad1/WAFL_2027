@@ -1,0 +1,23 @@
+# sim_controllers.yaml - tuning for the Gazebo joint controllers (read by wafl_gz_plugins.xacro).
+# Change a value or the mode here and relaunch - NO regeneration needed.
+# Written once by scripts/generate_assets.py (never overwritten, so your edits are safe).
+
+wheel_drive:                # front-left / front-right drive wheels, command = rad/s
+  mode: kinematic           # kinematic = joint velocity set directly (exact, no tuning)
+                            # force     = PID applies torque (acceleration lag, slip). PLACEHOLDER gains below.
+  p_gain: 8.0               # force mode only (numbers copied from the old caster controller)
+  i_gain: 0.1
+  d_gain: 0.4
+  i_max: 1.0
+  i_min: -1.0
+  cmd_max: 20.0
+  cmd_min: -20.0
+
+steering:                   # front_left/right_steer_joint + caster_joint (rear), command = radians
+  p_gain: 8.0
+  i_gain: 0.1
+  d_gain: 0.4
+  i_max: 1.0
+  i_min: -1.0
+  cmd_max: 20.0
+  cmd_min: -20.0

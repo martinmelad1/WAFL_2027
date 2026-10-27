@@ -49,8 +49,8 @@ Launch arguments: `use_sim_time` `world` `robot_xacro` `start_rsp` `bridge_confi
 ## Contracts other packages rely on
 
 * **World `warehouse`, model `wafl`** — hard-wired in the bridge and the plugin block.
-* **TF:** the DiffDrive TF goes to an unbridged topic. Only the EKF publishes `odom → base_footprint`.
-* **Actuation:** Gazebo reads `/cmd_vel_out` (never `/cmd_vel`), `/castor_cmd_pos` (rad), `/fork_cmd_vel` (m/s, + = up).
+* **TF:** the OdometryPublisher TF goes to an unbridged topic. Only the EKF publishes `odom → base_footprint`.
+* **Actuation:** Gazebo reads per-joint commands: `/front_steer_cmd_pos` (rad, both front wheels), `/front_left_wheel_cmd_vel` & `/front_right_wheel_cmd_vel` (rad/s), `/castor_cmd_pos` (rad, rear steering), `/fork_cmd_vel` (m/s, + = up). Raw `/cmd_vel` is never read.
 * **Sim IMU/odom** arrive as `/imu` and `/odom` with **zero covariance** → `odom_covariance_fix` → EKF.
 * **Map frame ≠ world frame.** SLAM Toolbox starts the map at the spawn pose, so Nav2 goals must use the
   `map:` poses in `locations.yaml` (`world:` poses are only for Gazebo / debugging).
@@ -87,8 +87,9 @@ Launch arguments: `use_sim_time` `world` `robot_xacro` `start_rsp` `bridge_confi
 
 - [ ] `ros2 launch wafl_simulation gazebo.launch.py` → world loads, robot spawns at the aisle end, no red errors.
 - [ ] `ros2 topic hz /clock /scan /camera/image_raw /camera/depth/image_raw /imu /odom /joint_states` all publish.
-- [ ] `ros2 topic pub -r 10 /cmd_vel_out geometry_msgs/Twist "{linear: {x: 0.3}}"` → robot drives forward.
-- [ ] `ros2 topic pub --once /castor_cmd_pos std_msgs/Float64 "{data: 0.5}"` → caster turns; `/fork_cmd_vel 0.1` → forks rise.
+- [ ] `ros2 topic pub -r 10 /front_left_wheel_cmd_vel std_msgs/Float64 "{data: 3.0}"` & right wheel → wheels rotate.
+- [ ] `ros2 topic pub --once /front_steer_cmd_pos std_msgs/Float64 "{data: 0.3}"` → front wheels turn together.
+- [ ] `ros2 topic pub --once /castor_cmd_pos std_msgs/Float64 "{data: 0.5}"` → rear caster turns; `/fork_cmd_vel 0.1` → forks rise.
 - [ ] **Marker orientation:** drive to A1 and run `pallet_pose_node` (or `cv2.aruco` on `/camera/image_raw`): ID 0 must be
       detected. If the marker is missing, regenerate with `--flip-v` and/or `--mirror-u` (a mirrored ArUco is never detected).
 - [ ] Robot carrying a pallet does not tip (validator predicts CoM at 0.29 m with the caster at 0.50 m).

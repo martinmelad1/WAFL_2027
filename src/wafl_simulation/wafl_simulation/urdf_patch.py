@@ -13,14 +13,15 @@ def build_robot_description(xacro_path):
     joints = {j.get('name'): j for j in root.findall('joint')}
 
     # 1) webs -> fixed, rotated so the wheel axis is lateral (+Y = forward rolling)
-    for web, wheel in WEBS:
-        psi = float(joints[wheel].find('origin').get('rpy').split()[2])
-        j = joints[web]
-        j.set('type', 'fixed')
-        for tag in ('axis', 'limit', 'dynamics'):
-            for e in j.findall(tag):
-                j.remove(e)
-        j.find('origin').set('rpy', '0 0 %.6f' % (math.pi - psi))
+    if all(web in joints and wheel in joints for web, wheel in WEBS):
+        for web, wheel in WEBS:
+            psi = float(joints[wheel].find('origin').get('rpy').split()[2])
+            j = joints[web]
+            j.set('type', 'fixed')
+            for tag in ('axis', 'limit', 'dynamics'):
+                for e in j.findall(tag):
+                    j.remove(e)
+            j.find('origin').set('rpy', '0 0 %.6f' % (math.pi - psi))
 
     # 2) drop legacy Gazebo-Classic / ros_control content
     for g in list(root.findall('gazebo')):
