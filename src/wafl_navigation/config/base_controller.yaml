@@ -1,0 +1,17 @@
+base_controller:
+  ros__parameters:
+    track_width: 0.3395          # m between the front wheels (from the 2025 CAD; verify on the robot)
+    wheelbase_L: 0.462           # m, front-axle midpoint -> rear steering axis (2025 CAD; measure on the robot)
+    wheel_radius: 0.1            # m (sim wheel rad/s = speed / radius)
+    max_front_angle_deg: 90.0
+    max_rear_angle_deg: 80.0     # D16: the real mechanism is +-80
+    max_wheel_speed: 1.0         # m/s
+    front_direction: 1.0         # +1 / -1, fix wiring here, never in firmware
+    rear_direction: 1.0
+    steer_settle_time: 1.0       # s
+    steer_deadband_deg: 1.0
+    cmd_timeout: 0.5             # s
+    autonomy_timeout: 0.2        # s (fork / dock priority window)
+    max_steer_rate_dps: 90.0     # slew limit on alpha / beta: a step command is the #1 cause of steering jitter
+    max_wheel_accel: 2.0         # m/s^2 ramp on wheel speeds, 0.0 = off (e-stop / timeouts always cut instantly)
+    rate_hz: 50.0
