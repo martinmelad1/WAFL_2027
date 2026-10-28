@@ -4,12 +4,11 @@
 # Contract (README sec. 6). Names that MUST stay in sync with the world / robot plugins:
 #   world name  = "warehouse"   (/world/warehouse/...)
 #   model name  = "wafl"        (/model/wafl/...)
-# The gz-side topics below are produced/consumed by wafl_simulation/urdf/wafl_gz_plugins.xacro
-# and worlds/warehouse.world.
 #
 # Deliberately NOT bridged:
-#   /model/wafl/tf*   DiffDrive TF - the EKF is the ONLY odom->base_footprint publisher.
-#   /cmd_vel          Gazebo must never read raw /cmd_vel; only the arbitrated /cmd_vel_out.
+#   /model/wafl/tf*   OdometryPublisher TF - the EKF is the ONLY odom->base_footprint publisher.
+#   /cmd_vel          Gazebo never reads raw /cmd_vel; it only reads the per-joint commands that
+#                     base_controller publishes after arbitration.
 
 # ---------------- clock (without this every use_sim_time node stalls) ----------------
 - ros_topic_name: "/clock"
@@ -19,33 +18,33 @@
   direction: GZ_TO_ROS
 
 # ---------------- sensors ----------------
-- ros_topic_name: "/scan"                      # RPLiDAR A2M8-like, frame laser_link
+- ros_topic_name: "/scan"
   gz_topic_name: "/lidar/scan"
   ros_type_name: "sensor_msgs/msg/LaserScan"
   gz_type_name: "gz.msgs.LaserScan"
   direction: GZ_TO_ROS
 
-- ros_topic_name: "/camera/image_raw"          # Kinect v1 RGB, 640x480 rgb8, frame camera_link
+- ros_topic_name: "/camera/image_raw"
   gz_topic_name: "/camera/image"
   ros_type_name: "sensor_msgs/msg/Image"
   gz_type_name: "gz.msgs.Image"
   direction: GZ_TO_ROS
 
-- ros_topic_name: "/camera/depth/image_raw"    # registered depth, 32FC1 in METRES (see README of this package)
+- ros_topic_name: "/camera/depth/image_raw"
   gz_topic_name: "/camera/depth"
   ros_type_name: "sensor_msgs/msg/Image"
   gz_type_name: "gz.msgs.Image"
   direction: GZ_TO_ROS
 
-- ros_topic_name: "/imu"                       # raw sim IMU; hardware publishes /imu/data instead
+- ros_topic_name: "/imu"
   gz_topic_name: "/imu"
   ros_type_name: "sensor_msgs/msg/Imu"
   gz_type_name: "gz.msgs.IMU"
   direction: GZ_TO_ROS
 
 # ---------------- odometry / joint state ----------------
-- ros_topic_name: "/odom"                      # frame_id odom, child_frame_id base_footprint, ZERO covariance
-  gz_topic_name: "/model/wafl/odometry"        # -> odom_covariance_fix -> /odom_fixed -> EKF
+- ros_topic_name: "/odom"
+  gz_topic_name: "/model/wafl/odometry"
   ros_type_name: "nav_msgs/msg/Odometry"
   gz_type_name: "gz.msgs.Odometry"
   direction: GZ_TO_ROS
@@ -56,20 +55,32 @@
   gz_type_name: "gz.msgs.Model"
   direction: GZ_TO_ROS
 
-# ---------------- actuation ----------------
-- ros_topic_name: "/cmd_vel_out"               # arbitrated output of base_controller (v, omega)
-  gz_topic_name: "/model/wafl/cmd_vel"
-  ros_type_name: "geometry_msgs/msg/Twist"
-  gz_type_name: "gz.msgs.Twist"
+# ---------------- actuation (all written by base_controller, except the fork) ----------------
+- ros_topic_name: "/front_steer_cmd_pos"
+  gz_topic_name: "/model/wafl/front_steer/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
   direction: ROS_TO_GZ
 
-- ros_topic_name: "/castor_cmd_pos"            # 2026 spelling kept on purpose; radians
+- ros_topic_name: "/castor_cmd_pos"
   gz_topic_name: "/model/wafl/joint/caster_joint/cmd_pos"
   ros_type_name: "std_msgs/msg/Float64"
   gz_type_name: "gz.msgs.Double"
   direction: ROS_TO_GZ
 
-- ros_topic_name: "/fork_cmd_vel"              # written by sim_fork_adapter; m/s, + = up
+- ros_topic_name: "/front_left_wheel_cmd_vel"
+  gz_topic_name: "/model/wafl/joint/front_left_wheel_joint/cmd_vel"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/front_right_wheel_cmd_vel"
+  gz_topic_name: "/model/wafl/joint/front_right_wheel_joint/cmd_vel"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/fork_cmd_vel"
   gz_topic_name: "/model/wafl/joint/fork_joint/cmd_vel"
   ros_type_name: "std_msgs/msg/Float64"
   gz_type_name: "gz.msgs.Double"

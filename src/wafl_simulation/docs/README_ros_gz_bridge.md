@@ -30,13 +30,15 @@ The Gazebo-side topics are produced or consumed by the robot plugins (`urdf/wafl
 
 | ROS topic | Gazebo topic | ROS type | Notes |
 |-----------|--------------|----------|-------|
-| `/cmd_vel_out` | `/model/wafl/cmd_vel` | `geometry_msgs/Twist` | Arbitrated output of `base_controller` (v, omega). Input of the DiffDrive plugin. |
-| `/castor_cmd_pos` | `/model/wafl/joint/caster_joint/cmd_pos` | `std_msgs/Float64` | Caster angle in radians. The "castor" spelling is kept from 2026. |
+| `/front_steer_cmd_pos` | `/model/wafl/front_steer/cmd_pos` | `std_msgs/Float64` | Front steering angle alpha in radians. Both front steering joints listen to this one gz topic, so they stay parallel. Written by `base_controller`. |
+| `/front_left_wheel_cmd_vel` | `/model/wafl/joint/front_left_wheel_joint/cmd_vel` | `std_msgs/Float64` | Front-left wheel angular velocity in rad/s. Written by `base_controller`. |
+| `/front_right_wheel_cmd_vel` | `/model/wafl/joint/front_right_wheel_joint/cmd_vel` | `std_msgs/Float64` | Front-right wheel angular velocity in rad/s. Written by `base_controller`. |
+| `/castor_cmd_pos` | `/model/wafl/joint/caster_joint/cmd_pos` | `std_msgs/Float64` | Rear steering angle beta in radians. The "castor" spelling is kept from 2026. Written by `base_controller`. |
 | `/fork_cmd_vel` | `/model/wafl/joint/fork_joint/cmd_vel` | `std_msgs/Float64` | Fork joint velocity in m/s, + = up. Written by `sim_fork_adapter`. |
 
 ## Deliberately NOT bridged
-- **`/model/wafl/tf*` (DiffDrive TF).** The EKF is the only publisher of `odom -> base_footprint`; bridging this would create a second publisher.
-- **`/cmd_vel`.** Gazebo must never read raw `/cmd_vel`. Only `/cmd_vel_out` (after `base_controller` arbitration) reaches the robot, so manual, fork and dock commands cannot bypass the e-stop and priority logic.
+- **`/model/wafl/tf*` (OdometryPublisher TF).** The EKF is the only publisher of `odom -> base_footprint`; bridging this would create a second publisher.
+- **`/cmd_vel`.** Gazebo must never read raw `/cmd_vel`. Only the per-joint commands published by `base_controller` after arbitration reach the robot, so manual, fork and dock commands cannot bypass the e-stop and priority logic.
 
 ## Adding a topic
 Append an entry:

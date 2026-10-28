@@ -13,44 +13,68 @@
   Gazebo model name MUST be "wafl" (gazebo.launch.py spawns with -name wafl).
 
   Design rules taken from the README:
-    * DiffDrive listens on /model/wafl/cmd_vel  <- ros /cmd_vel_out (arbitrated), NEVER raw /cmd_vel.
-    * DiffDrive TF is sent to an UNBRIDGED topic: the EKF is the only odom->base_footprint publisher.
+       * Odometry comes from OdometryPublisher; there is NO DiffDrive (it cannot model steered wheels).
+    * The odometry TF goes to an UNBRIDGED topic: the EKF is the only odom->base_footprint publisher.
     * Caster = joint position controller (radians) on /model/wafl/joint/caster_joint/cmd_pos.
     * Fork   = joint velocity controller on /model/wafl/joint/fork_joint/cmd_vel.
 -->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-  <xacro:arg name="wheel_radius" default="0.1"/>
-  <xacro:arg name="track_width"  default="0.3395"/>
-
-  <gazebo>
-    <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
-      <left_joint>leftwheel</left_joint>
-      <right_joint>rightwheel</right_joint>
-      <wheel_separation>$(arg track_width)</wheel_separation>
-      <wheel_radius>$(arg wheel_radius)</wheel_radius>
-      <topic>/model/wafl/cmd_vel</topic>
+    <gazebo>
+    <!-- Odometry = ground-truth pose of the model (base_footprint). Its TF goes to an UNBRIDGED topic:
+         the EKF is the only odom->base_footprint publisher. -->
+    <plugin filename="gz-sim-odometry-publisher-system" name="gz::sim::systems::OdometryPublisher">
+      <odom_frame>odom</odom_frame>
+      <robot_base_frame>base_footprint</robot_base_frame>
       <odom_topic>/model/wafl/odometry</odom_topic>
       <tf_topic>/model/wafl/tf_unused_ekf_owns_odom_tf</tf_topic>
-      <frame_id>odom</frame_id>
-      <child_frame_id>base_footprint</child_frame_id>
       <odom_publish_frequency>50</odom_publish_frequency>
-      <max_linear_velocity>1.0</max_linear_velocity>
-      <min_linear_velocity>-1.0</min_linear_velocity>
-      <max_angular_velocity>1.5</max_angular_velocity>
-      <min_angular_velocity>-1.5</min_angular_velocity>
+      <dimensions>2</dimensions>
     </plugin>
 
+    <!-- FRONT STEERING (alpha): both joints listen to the SAME gz topic, so they stay parallel like the chain. -->
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>leftweb</joint_name>
+      <topic>/model/wafl/front_steer/cmd_pos</topic>
+      <p_gain>60.0</p_gain><i_gain>1.0</i_gain><d_gain>2.0</d_gain>
+      <i_max>10.0</i_max><i_min>-10.0</i_min>
+      <cmd_max>40.0</cmd_max><cmd_min>-40.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>rightweb</joint_name>
+      <topic>/model/wafl/front_steer/cmd_pos</topic>
+      <p_gain>60.0</p_gain><i_gain>1.0</i_gain><d_gain>2.0</d_gain>
+      <i_max>10.0</i_max><i_min>-10.0</i_min>
+      <cmd_max>40.0</cmd_max><cmd_min>-40.0</cmd_min>
+    </plugin>
+
+    <!-- REAR STEERING (beta) -->
     <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
       <joint_name>castorjoint</joint_name>
       <topic>/model/wafl/joint/caster_joint/cmd_pos</topic>
-      <p_gain>8.0</p_gain>
-      <i_gain>0.1</i_gain>
-      <d_gain>0.4</d_gain>
-      <i_max>1.0</i_max>
-      <i_min>-1.0</i_min>
-      <cmd_max>20.0</cmd_max>
-      <cmd_min>-20.0</cmd_min>
+      <p_gain>40.0</p_gain><i_gain>0.8</i_gain><d_gain>1.2</d_gain>
+      <i_max>8.0</i_max><i_min>-8.0</i_min>
+      <cmd_max>30.0</cmd_max><cmd_min>-30.0</cmd_min>
     </plugin>
+
+    <!-- FRONT DRIVE WHEELS: velocity PID acting on torque (a raw velocity set makes the body jerk).
+         If gz rejects use_force_commands, delete it and the gain tags: you get plain velocity control. -->
+    <plugin filename="gz-sim-joint-controller-system" name="gz::sim::systems::JointController">
+      <joint_name>leftwheel</joint_name>
+      <topic>/model/wafl/joint/front_left_wheel_joint/cmd_vel</topic>
+      <use_force_commands>true</use_force_commands>
+      <p_gain>4.0</p_gain><i_gain>1.0</i_gain><d_gain>0.0</d_gain>
+      <i_max>5.0</i_max><i_min>-5.0</i_min>
+      <cmd_max>8.0</cmd_max><cmd_min>-8.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-controller-system" name="gz::sim::systems::JointController">
+      <joint_name>rightwheel</joint_name>
+      <topic>/model/wafl/joint/front_right_wheel_joint/cmd_vel</topic>
+      <use_force_commands>true</use_force_commands>
+      <p_gain>4.0</p_gain><i_gain>1.0</i_gain><d_gain>0.0</d_gain>
+      <i_max>5.0</i_max><i_min>-5.0</i_min>
+      <cmd_max>8.0</cmd_max><cmd_min>-8.0</cmd_min>
+    </plugin>
+    <!-- rear wheel (castorwheel): passive, no plugin -->
 
     <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher"/>
   </gazebo>
