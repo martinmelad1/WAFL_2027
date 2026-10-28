@@ -41,6 +41,7 @@ class SmokeTest(Node):
         super().__init__('wafl_smoke_test')
         self.a = a
         self.pos, self.hist, self.fork, self.results = {}, {}, [], []
+        self.sim_t = None
         self.cmd = [0.0, 0.0, 0.0, 0.0]   # [alpha_deg, beta_deg, v_left, v_right]
         self.lift = None
         self.create_subscription(JointState, '/joint_states', self._js, qos_profile_sensor_data)
@@ -52,8 +53,14 @@ class SmokeTest(Node):
         self.pub_lift = self.create_publisher(Int32, '/lift_cmd', 10)
 
     # ---------------------------------------------------------------- io
+    def _now(self):
+        return self.sim_t if self.sim_t is not None else time.monotonic()
+
     def _js(self, msg):
-        t = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9 or time.monotonic()
+        stamp = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
+        if stamp > 0.0:
+            self.sim_t = stamp
+        t = self._now()
         for name, p in zip(msg.name, msg.position):
             self.pos[name] = p
             h = self.hist.setdefault(name, [])
@@ -61,7 +68,7 @@ class SmokeTest(Node):
                 h.append((t, p))
 
     def _fh(self, msg):
-        self.fork.append((time.monotonic(), msg.data))
+        self.fork.append((self._now(), msg.data))
 
     def _send(self):
         self.pub_joint.publish(Float32MultiArray(data=[float(x) for x in self.cmd]))
@@ -69,12 +76,14 @@ class SmokeTest(Node):
             self.pub_lift.publish(Int32(data=int(self.lift)))
 
     def phase(self, secs, cmd=None):
-        """Publish the command at 10 Hz for `secs`; return {joint: samples recorded during the phase}."""
+        """Publish the command at 10 Hz for `secs` of simulation time; return {joint: samples recorded during the phase}."""
         if cmd is not None:
             self.cmd = list(cmd)
         marks = {n: len(h) for n, h in self.hist.items()}
-        end, next_pub = time.monotonic() + secs, 0.0
-        while time.monotonic() < end and rclpy.ok():
+        start_sim = self._now()
+        wall_end = time.monotonic() + max(secs * 10.0, 15.0)
+        next_pub = 0.0
+        while (self._now() - start_sim) < secs and time.monotonic() < wall_end and rclpy.ok():
             if time.monotonic() >= next_pub:
                 self._send()
                 next_pub = time.monotonic() + 0.1
