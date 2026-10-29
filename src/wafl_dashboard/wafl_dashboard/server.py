@@ -54,8 +54,8 @@ async def lifespan(_app):
 
 
 app = FastAPI(title="WAFL Dashboard API", lifespan=lifespan)
-app.mount("/css", StaticFiles(directory=STATIC / "css"), name="css")
-app.mount("/js", StaticFiles(directory=STATIC / "js"), name="js")
+app.mount("/css", StaticFiles(directory=STATIC / "css", follow_symlink=True), name="css")
+app.mount("/js", StaticFiles(directory=STATIC / "js", follow_symlink=True), name="js")
 
 
 @app.get("/")
@@ -101,9 +101,9 @@ def map_meta():
 
 @app.post("/api/estop")
 def estop(req: EstopRequest):
-    n = ros(); n.pub_estop.publish(Bool(data=req.active))
+    n = ros(); n.pub_estop.publish(Bool(data=req.active)); n.on_estop(Bool(data=req.active))
     if req.active:
-        n.stop(); n.pub_mode.publish(String(data="MANUAL"))
+        n.pub_mode.publish(String(data="MANUAL")); n.on_mode(String(data="MANUAL"))
     return {"accepted": True, "active": req.active}
 
 @app.post("/api/mode")
@@ -112,7 +112,7 @@ def mode(req: ModeRequest):
     if value not in ("AUTO", "MANUAL"): raise HTTPException(422, "mode must be AUTO or MANUAL")
     if value == "AUTO" and n.data["estop"]: raise HTTPException(409, "Reset E-stop before resuming AUTO")
     if value == "AUTO": n.stop()
-    n.pub_mode.publish(String(data=value))
+    n.pub_mode.publish(String(data=value)); n.on_mode(String(data=value))
     return {"accepted": True, "mode": value}
 
 @app.post("/api/joy")

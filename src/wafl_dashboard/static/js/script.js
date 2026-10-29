@@ -55,7 +55,7 @@ function render(data = {}) {
   if (battery != null) { $('status-battery').textContent = `${Math.round(battery)}%`; $('battery-bar').style.width = `${battery}%`; }
   if (s.fork_height_mm != null) $('status-fork').textContent = `${(s.fork_height_mm / 10).toFixed(1)} cm`;
   if (s.mode) setMode(s.mode.toLowerCase());
-  if (s.estop != null) { led('safety-estop', s.estop ? 'red' : null); $('estop').textContent = s.estop ? 'RESET E-STOP' : 'E-STOP'; }
+  if (s.estop != null) { led('safety-estop', s.estop ? 'red' : null); led('safety-normal', s.estop ? null : 'green'); $('estop').textContent = s.estop ? 'RESET E-STOP' : 'E-STOP'; }
   if (data.health) led('system-led', 'green');
   if (data.mission_status?.active) {
     const m = data.mission_status.active;
